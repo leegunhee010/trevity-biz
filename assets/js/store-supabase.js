@@ -25,9 +25,17 @@ const TvData = {
   },
 
   async loadContent(){
+    // 관리자는 미발행/비활성 항목도 목록에서 봐야 하므로 필터를 생략한다.
+    // (RLS가 비관리자에게는 published/active 행만 허용하므로 안전)
+    let bpQ = SB.from('blog_posts').select('*');
+    let pfQ = SB.from('portfolio_items').select('*');
+    if(!this.admin){
+      bpQ = bpQ.eq('published', true);
+      pfQ = pfQ.eq('active', true);
+    }
     const [bp, pf, pk] = await Promise.all([
-      SB.from('blog_posts').select('*').eq('published', true).order('created_at', {ascending:false}),
-      SB.from('portfolio_items').select('*').eq('active', true).order('sort_order'),
+      bpQ.order('created_at', {ascending:false}),
+      pfQ.order('sort_order'),
       SB.from('packages').select('*').order('sort_order'),
     ]);
     if(bp.error) console.error('트래비티 콘텐츠 로드 실패(blog_posts)', bp.error);
@@ -81,9 +89,18 @@ Object.assign(Admin, {
   },
   async logout(){ await SB.auth.signOut(); TvData.session=null; TvData.admin=false; },
 
-  async setInquiryStatus(id, status){ await SB.from('inquiries').update({status}).eq('id', id); },
-  async setInquiryMemo(id, memo){ await SB.from('inquiries').update({memo}).eq('id', id); },
-  async deleteInquiry(id){ await SB.from('inquiries').delete().eq('id', id); },
+  async setInquiryStatus(id, status){
+    const { error } = await SB.from('inquiries').update({status}).eq('id', id);
+    if(error) throw new Error(error.message);
+  },
+  async setInquiryMemo(id, memo){
+    const { error } = await SB.from('inquiries').update({memo}).eq('id', id);
+    if(error) throw new Error(error.message);
+  },
+  async deleteInquiry(id){
+    const { error } = await SB.from('inquiries').delete().eq('id', id);
+    if(error) throw new Error(error.message);
+  },
 
   async upsertBlogPost(p){
     const { error } = await SB.from('blog_posts').upsert({
@@ -91,13 +108,19 @@ Object.assign(Admin, {
     }, { onConflict: 'slug' });
     if(error) throw new Error(error.message);
   },
-  async deleteBlogPost(slug){ await SB.from('blog_posts').delete().eq('slug', slug); },
+  async deleteBlogPost(slug){
+    const { error } = await SB.from('blog_posts').delete().eq('slug', slug);
+    if(error) throw new Error(error.message);
+  },
 
   async upsertPortfolioItem(item){
     const { error } = await SB.from('portfolio_items').upsert(item);
     if(error) throw new Error(error.message);
   },
-  async deletePortfolioItem(id){ await SB.from('portfolio_items').delete().eq('id', id); },
+  async deletePortfolioItem(id){
+    const { error } = await SB.from('portfolio_items').delete().eq('id', id);
+    if(error) throw new Error(error.message);
+  },
   async movePortfolioItem(id, dir){
     const list = [...TV_PORTFOLIO];
     const i = list.findIndex(x=>x.id===id);
