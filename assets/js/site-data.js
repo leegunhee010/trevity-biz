@@ -57,6 +57,21 @@ function renderPortfolioRoll(selector, placement){
   });
 }
 
+/* ---------- 히어로 영상벽 (local-vn/stay/tourist-vn/tourist-cn/vietnam-tiktok) ----------
+   원본 swiper-slide 마크업(사이즈 클래스 포함)을 그대로 재생성한다.
+   아이템이 없으면 정적 원본 마크업을 그대로 둔다. */
+function renderHeroWall(selector){
+  const wrap = document.querySelector(selector);
+  const items = TV_PORTFOLIO.filter(x=>x.placement==='hero-wall' && x.active!==false).sort((a,b)=>a.sort_order-b.sort_order);
+  if(!wrap || !items.length) return;
+  const slide = it => `<div class="swiper-slide mn:!w-[256px] !w-[128px]" style="margin-right:10px"><div class="mn:rounded-[16px] overflow-hidden rounded-[8px]"><div class="size-full">${
+    it.media_type === 'video'
+      ? `<video src="${esc(it.url)}" poster="${esc(it.poster_url)}" muted loop playsinline autoplay preload="metadata" class="h-[220px] w-[128px] object-cover mn:h-[440px] mn:w-[256px]" aria-label="${esc(it.alt||'트래비티 인플루언서 콘텐츠')}"></video>`
+      : `<img loading="lazy" src="${esc(TvImg.resolve(it.url))}" alt="${esc(it.alt||'')}" class="h-[220px] w-[128px] object-cover mn:h-[440px] mn:w-[256px]" style="background:#fff"/>`
+  }</div></div></div>`;
+  wrap.innerHTML = items.map(slide).join('');
+}
+
 /* ---------- 패키지 카드 (vietnam-tiktok.html) ---------- */
 function renderPackages(containerSelector){
   const el = document.querySelector(containerSelector);
