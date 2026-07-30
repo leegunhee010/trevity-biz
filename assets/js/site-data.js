@@ -11,7 +11,42 @@ async function TvBoot(){
   override('tv_blog_override', TV_BLOG_POSTS);
   override('tv_portfolio_override', TV_PORTFOLIO);
   override('tv_packages_override', TV_PACKAGES);
+  try{
+    const c = JSON.parse(localStorage.getItem('tv_copy_override') || '{}');
+    if(typeof TV_COPY_OVR !== 'undefined') Object.assign(TV_COPY_OVR, c);
+  }catch(e){}
   try{ await TvImg.loadCache(); }catch(e){}
+}
+
+/* ---------- 카피 오버라이드 적용 ----------
+   copy-data.js의 추출 규칙과 동일하게 leaf 텍스트를 정규화·해시해서
+   TV_COPY_OVR에 오버라이드가 있으면 교체한다. (모든 페이지 공통) */
+const TV_COPY_TAGS = 'h1,h2,h3,h4,h5,h6,p,span,a,b,strong,em,small,li,td,th,button,div,label,summary,figcaption,blockquote,i,u';
+function tvCopyKey(t){
+  let h = 5381;
+  for(let i=0;i<t.length;i++) h = ((h<<5)+h+t.charCodeAt(i))|0;
+  return 'c' + (h>>>0).toString(16);
+}
+function tvLeafText(el){
+  const parts = [];
+  for(const c of el.childNodes){
+    if(c.nodeType === 3) parts.push(c.nodeValue);
+    else if(c.nodeType === 1 && c.tagName === 'BR') parts.push('\n');
+    else return null;
+  }
+  const t = parts.join('').split('\n').map(ln=>ln.replace(/\s+/g,' ').trim()).join('\n').trim();
+  return t || null;
+}
+function applyCopy(){
+  if(typeof TV_COPY_OVR === 'undefined' || !Object.keys(TV_COPY_OVR).length) return;
+  document.body.querySelectorAll(TV_COPY_TAGS).forEach(el=>{
+    if(el.closest('script,style')) return;
+    const t = tvLeafText(el);
+    if(!t || t.length < 2 || t.length > 600) return;
+    const v = TV_COPY_OVR[tvCopyKey(t)];
+    if(v === undefined || v === null || v === t) return;
+    el.innerHTML = esc(v).replace(/\n/g,'<br>');
+  });
 }
 
 /* ---------- 블로그 목록 (blog.html) ---------- */

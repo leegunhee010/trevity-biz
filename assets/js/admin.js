@@ -310,9 +310,62 @@ function saveBlogPost(oldSlug){
 }
 
 /* ============================================================
-   카피 — 포트폴리오 이미지 + 패키지 가격
+   카피 — 텍스트 전체 편집 + 포트폴리오 이미지 + 패키지 가격
    ============================================================ */
 let pfEditing = null;
+let copyPage = 'index';
+let copySearch = '';
+
+const COPY_PAGE_LABELS = {
+  'index':'메인', 'vietnam-tiktok':'수출 랜딩', 'local-vn':'베트남 현지', 'stay':'숙박',
+  'tourist-vn':'베트남 관광객', 'tourist-cn':'중국 관광객', 'tourist':'관광객(구)', 'local':'현지(구)',
+  'experience':'체험단', 'export':'해외수출', 'famtour':'팸투어', 'help':'고객센터',
+  'agency':'공식대행사', 'about':'회사소개', 'inquiry':'문의', 'blog':'블로그', 'coming-soon':'준비중',
+};
+
+function copyEntries(){
+  let list = TV_COPY_DEFAULTS;
+  if(copySearch){
+    const q = copySearch.toLowerCase();
+    list = list.filter(e => e.t.toLowerCase().includes(q) || (TV_COPY_OVR[e.k]||'').toLowerCase().includes(q));
+  } else {
+    list = list.filter(e => e.pg.includes(copyPage));
+  }
+  return list;
+}
+
+function renderCopyText(){
+  const box = document.getElementById('copy-text-list');
+  if(!box) return;
+  const list = copyEntries();
+  const ovrCnt = Object.keys(TV_COPY_OVR).length;
+  document.getElementById('copy-ovr-cnt').textContent = ovrCnt ? `수정된 카피 ${ovrCnt}건` : '';
+  box.innerHTML = list.slice(0, 400).map(e=>{
+    const cur = TV_COPY_OVR[e.k] !== undefined ? TV_COPY_OVR[e.k] : e.t;
+    const changed = TV_COPY_OVR[e.k] !== undefined;
+    const multi = e.t.includes('\n') || e.t.length > 60;
+    const field = multi
+      ? `<textarea class="srch" style="width:100%;min-height:56px" data-copy-key="${e.k}" onchange="saveCopyField(this)">${esc(cur)}</textarea>`
+      : `<input class="srch" style="width:100%" data-copy-key="${e.k}" value="${esc(cur)}" onchange="saveCopyField(this)">`;
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--adm-line)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+        <span style="font-size:11px;color:${changed?'var(--tv-primary)':'var(--adm-sub)'};font-weight:700">${changed?'수정됨':'기본'}</span>
+        <span style="font-size:11px;color:var(--adm-sub)">${e.pg.map(p=>COPY_PAGE_LABELS[p]||p).join(' · ')}</span>
+        ${changed?`<button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:11px;margin-left:auto" onclick="resetCopyField('${e.k}')">기본값으로</button>`:''}
+      </div>${field}</div>`;
+  }).join('') || `<p class="note" style="margin:0">해당하는 카피가 없습니다.</p>`;
+}
+function saveCopyField(el){
+  const key = el.getAttribute('data-copy-key');
+  const def = TV_COPY_DEFAULTS.find(e=>e.k===key);
+  const v = el.value;
+  if(def && v === def.t){ admDo(Admin.delCopy(key), 0); return; }
+  admDo(Admin.setCopy(key, v), 0);
+  toastA('저장됨 — 사이트 새로고침 시 반영');
+}
+function resetCopyField(key){
+  admDo(Admin.delCopy(key), 0);
+}
 
 function renderCopy(){
   const el = document.getElementById('tab-copy');
@@ -320,6 +373,17 @@ function renderCopy(){
   const hero = TV_PORTFOLIO.filter(x=>x.placement==='hero-wall').sort((a,b)=>a.sort_order-b.sort_order);
 
   el.innerHTML = `
+    <div class="card"><div class="card-head"><h3>텍스트 카피 (전 페이지 ${TV_COPY_DEFAULTS.length}개 항목)</h3><span class="sp"></span><span class="note" style="margin:0" id="copy-ovr-cnt"></span></div>
+      <div class="bar">
+        <select class="srch" style="min-width:150px" onchange="copyPage=this.value;copySearch='';document.getElementById('copy-srch').value='';renderCopyText()">${
+          Object.keys(COPY_PAGE_LABELS).map(p=>`<option value="${p}" ${copyPage===p?'selected':''}>${COPY_PAGE_LABELS[p]} (${p})</option>`).join('')
+        }</select>
+        <input class="srch grow" id="copy-srch" placeholder="전체 페이지에서 문구 검색…" value="${esc(copySearch)}"
+          oninput="copySearch=this.value;renderCopyText()">
+      </div>
+      <p class="note" style="margin-bottom:6px">같은 문구가 여러 곳에 쓰이면 한 번에 바뀝니다. 줄바꿈은 그대로 반영됩니다.</p>
+      <div id="copy-text-list" style="max-height:560px;overflow-y:auto"></div>
+    </div>` + `
     <div class="card"><div class="card-head"><h3>포트폴리오 — 메인 페이지 롤 (index.html)</h3><span class="sp"></span>
       <button class="btn btn-primary btn-sm" onclick="pfEditing='home-roll';renderCopy()">+ 추가</button></div>
       ${pfEditing==='home-roll' ? pfForm('home-roll') : ''}
@@ -333,6 +397,7 @@ function renderCopy(){
     <div class="card"><div class="card-head"><h3>vietnam-tiktok.html 패키지 가격</h3></div>
       ${TV_PACKAGES.slice().sort((a,b)=>a.sort_order-b.sort_order).map(pkgForm).join('')}
     </div>`;
+  renderCopyText();
 }
 
 function pfList(items){

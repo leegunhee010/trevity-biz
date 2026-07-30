@@ -11,6 +11,7 @@
 SQL Editor → New query 에 순서대로 붙여넣고 Run:
 1. `supabase/01_schema.sql`
 2. `supabase/02_seed.sql`
+3. `supabase/04_copy.sql` — 텍스트 카피 편집 테이블
 
 ## 3. 이미지 저장소
 Storage → New bucket → 이름 `trevity-images` → Public bucket 체크. 그다음 SQL Editor에서:

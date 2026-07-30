@@ -33,14 +33,18 @@ const TvData = {
       bpQ = bpQ.eq('published', true);
       pfQ = pfQ.eq('active', true);
     }
-    const [bp, pf, pk] = await Promise.all([
+    const [bp, pf, pk, cp] = await Promise.all([
       bpQ.order('created_at', {ascending:false}),
       pfQ.order('sort_order'),
       SB.from('packages').select('*').order('sort_order'),
+      SB.from('site_copy').select('*'),
     ]);
     if(bp.error) console.error('트래비티 콘텐츠 로드 실패(blog_posts)', bp.error);
     if(pf.error) console.error('트래비티 콘텐츠 로드 실패(portfolio_items)', pf.error);
     if(pk.error) console.error('트래비티 콘텐츠 로드 실패(packages)', pk.error);
+    if(!cp.error && typeof TV_COPY_OVR !== 'undefined'){
+      (cp.data||[]).forEach(r => { TV_COPY_OVR[r.key] = r.value; });
+    }
 
     TV_BLOG_POSTS.length = 0;
     (bp.data||[]).forEach(p => TV_BLOG_POSTS.push(p));
@@ -133,6 +137,17 @@ Object.assign(Admin, {
   async upsertPackage(p){
     const { error } = await SB.from('packages').upsert(p, { onConflict: 'slug' });
     if(error) throw new Error(error.message);
+  },
+
+  async setCopy(key, value){
+    const { error } = await SB.from('site_copy').upsert({ key, value }, { onConflict: 'key' });
+    if(error) throw new Error(error.message);
+    if(typeof TV_COPY_OVR !== 'undefined') TV_COPY_OVR[key] = value;
+  },
+  async delCopy(key){
+    const { error } = await SB.from('site_copy').delete().eq('key', key);
+    if(error) throw new Error(error.message);
+    if(typeof TV_COPY_OVR !== 'undefined') delete TV_COPY_OVR[key];
   },
 });
 

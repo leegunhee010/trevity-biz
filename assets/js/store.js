@@ -83,6 +83,20 @@ const Admin = {
     this.savePortfolio(list);
   },
 
+  /* ---- 카피 오버라이드 ---- */
+  async setCopy(key, value){
+    const m = tvRead('tv_copy_override', {});
+    m[key] = value;
+    tvWrite('tv_copy_override', m);
+    if(typeof TV_COPY_OVR !== 'undefined') TV_COPY_OVR[key] = value;
+  },
+  async delCopy(key){
+    const m = tvRead('tv_copy_override', {});
+    delete m[key];
+    tvWrite('tv_copy_override', m);
+    if(typeof TV_COPY_OVR !== 'undefined') delete TV_COPY_OVR[key];
+  },
+
   /* ---- 패키지 CRUD (3종 고정 slug, 수정만) ---- */
   savePackages(list){ tvWrite('tv_packages_override', list); TV_PACKAGES.length = 0; TV_PACKAGES.push(...list); },
   async upsertPackage(p){
