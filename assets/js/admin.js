@@ -130,7 +130,7 @@ function renderNav(){
   const counts = { inq:newCnt||'', board:TV_BLOG_POSTS.length, copy:'', dash:'', seo:'', settings:'' };
   document.getElementById('sb-nav').innerHTML = NAV.map(n=>navBtn(n,counts)).join('')
     + `<div class="grp">도구</div>`
-    + `<button onclick="window.open(EDIT_ORIGIN+'/','_blank')"><span>✏️ 화면 편집 (사이트 보면서 수정)</span></button>`;
+    + `<button onclick="window.open(EDIT_ORIGIN+'/?edit=1','_blank')"><span>✏️ 화면 편집 (사이트 보면서 수정)</span></button>`;
 }
 
 /* ---------- 게시판 · SEO (편집 서버 UI 내장) ---------- */

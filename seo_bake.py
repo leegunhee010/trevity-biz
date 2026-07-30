@@ -517,10 +517,12 @@ def bake_board():
         f'<div class="tv-card-body"><span class="tv-chip">{p.get("category","")}</span><h3>{p.get("title","")}</h3>'
         f'<div class="tv-meta"><time>{str(p.get("created_at",""))[:10]}</time><span>{p.get("read_minutes",4)}분 분량</span></div></div>'
         f'</a></article>' for p in posts)
-    m = re.search(r'(<div class="tv-grid">)(.*?)(</div>)', s, re.S)
-    if m:
-        s = s[:m.start()] + m.group(1) + cards + m.group(3) + s[m.end():]
-        _write(bp, s)
+    # 마커 기반 교체 — 카드 내부 </div> 때문에 regex 로 grid 경계를 잡으면 구조가 깨진다(2026-07-31 실제 사고)
+    if "<!--bd-cards-->" not in s:
+        s = s.replace('<div class="tv-grid">', '<div class="tv-grid"><!--bd-cards--><!--/bd-cards-->', 1)
+    s = re.sub(r"<!--bd-cards-->.*?<!--/bd-cards-->",
+               lambda m: "<!--bd-cards-->" + cards + "<!--/bd-cards-->", s, flags=re.S)
+    _write(bp, s)
     # rss 갱신
     bake_technical()
     return files

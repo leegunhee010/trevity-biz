@@ -2,6 +2,12 @@
    켜면 텍스트에 마우스를 올려 클릭 → 그 자리에서 수정 → 포커스 빠지면 HTML 파일에 바로 저장.
    같은 문구가 페이지 안에 여러 번(모바일/PC 중복 스팬) 있으면 전부 함께 바뀐다. */
 (function(){
+  /* 편집 UI는 관리자가 의도적으로 연 세션에서만 노출:
+     ?edit=1 로 진입하면 세션 내내 유지, 편집 끄기+ESC 로 세션 종료.
+     (일반 방문 화면에는 아무것도 안 보임) */
+  if(/[?&]edit=1/.test(location.search)) sessionStorage.setItem('tvedit_sess', '1');
+  if(sessionStorage.getItem('tvedit_sess') !== '1') return;
+
   const TAGS = 'h1,h2,h3,h4,h5,h6,p,span,a,b,strong,em,small,li,td,th,button,div,label,summary,figcaption,blockquote,i,u';
   let on = false;
   let editing = null;   // { el, origNorm, group: [{el, origOuter}] }
@@ -59,7 +65,12 @@
     btn.classList.toggle('on', on);
     document.body.classList.toggle('tvedit-on', on);
     if(on) say('문구를 클릭해 수정, 이미지를 클릭해 교체하세요. 저장은 파일에 바로 반영됩니다.', 5200);
-    else { if(editing) finish(false); clearHl(); }
+    else {
+      if(editing) finish(false); clearHl();
+      // 편집 끄기 = 편집 세션 종료 → 일반 화면으로 (버튼도 사라짐)
+      sessionStorage.removeItem('tvedit_sess');
+      bar.remove();
+    }
   }
 
   /* ---------- 이미지·영상·배경 교체 ----------
