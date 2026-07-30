@@ -73,7 +73,11 @@ img[src*="request-form"],img[src*="recommendation-list"],img[src*="price-search-
 </style><link rel="canonical" href="https://leegunhee010.github.io/trevity-biz/inquiry.html">
 <meta property="og:url" content="https://leegunhee010.github.io/trevity-biz/inquiry.html"/>
 <meta name="keywords" content="인플루언서 마케팅 문의, 베트남 마케팅 견적"/>
+
+
+
 <!--crumb-ld--><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "홈", "item": "https://leegunhee010.github.io/trevity-biz/"}, {"@type": "ListItem", "position": 2, "name": "문의", "item": "https://leegunhee010.github.io/trevity-biz/inquiry.html"}]}</script><!--/crumb-ld-->
+
 </head><style id="inquiry-style">
 html{scroll-behavior:smooth}
 .iq-hero{background:linear-gradient(180deg,#ffe9ee,#fff);padding:150px 20px 48px;text-align:center}
@@ -194,7 +198,23 @@ html{scroll-behavior:smooth}
       phone: fd.phone.value.trim(), email: fd.email.value.trim(),
       message: msg, source_page: 'inquiry.html',
     }).then(function (r) {
-      if (r && r.ok) { done(); return; }
+      if (r && r.ok) {
+        // 메일 알림 (SEO 관리 → 설정에서 Apps Script 주소를 넣으면 발송)
+        if (window.TV_MAIL_ENDPOINT) {
+          try {
+            var md = new FormData();
+            md.append('company', fd.company.value.trim());
+            md.append('name', fd.name.value.trim());
+            md.append('phone', fd.phone.value.trim());
+            md.append('email', fd.email.value.trim());
+            md.append('message', msg);
+            md.append('page', 'trevity-inquiry');
+            md.append('ts', new Date().toISOString());
+            fetch(window.TV_MAIL_ENDPOINT, { method: 'POST', mode: 'no-cors', body: md });
+          } catch (e) {}
+        }
+        done(); return;
+      }
       btn.disabled = false; btn.textContent = '문의 접수하기';
       alert('접수 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
     }).catch(function () {

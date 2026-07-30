@@ -40,11 +40,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if path == '/api/settings':
             self._json(seo_bake.settings())
             return
+        if path == '/api/board':
+            self._json(seo_bake.blog_posts())
+            return
         if path == '/':
             path = '/index.html'
         fs_path = os.path.normpath(os.path.join(ROOT, path.lstrip('/')))
-        if fs_path == os.path.join(ROOT, 'seo.html'):
-            return super().do_GET()   # SEO 관리 UI에는 편집 오버레이 미주입
+        if fs_path in (os.path.join(ROOT, 'seo.html'), os.path.join(ROOT, 'board.html')):
+            return super().do_GET()   # 관리 UI에는 편집 오버레이 미주입
         if fs_path.startswith(ROOT) and fs_path.endswith('.html') and os.path.isfile(fs_path):
             data = io.open(fs_path, encoding='utf-8').read()
             # </body> 마지막 위치에 편집 스크립트 주입
@@ -96,13 +99,56 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self._json({'ok': False, 'error': str(e)}, 400)
             return
 
+        # ---------- 게시판: 글 저장(+정적 굽기) / 삭제 ----------
+        if path == '/api/board':
+            try:
+                d = self._body()
+                post = d.get('post') or {}
+                slug = (post.get('slug') or '').strip()
+                if not re.match(r'^[a-z0-9-]+$', slug):
+                    raise ValueError('슬러그는 영문 소문자·숫자·하이픈만 가능합니다')
+                posts = seo_bake.blog_posts()
+                now = time.strftime('%Y-%m-%d')
+                i = next((i for i, p in enumerate(posts) if p.get('slug') == slug), -1)
+                if i >= 0:
+                    posts[i].update(post)
+                    posts[i]['updated_at'] = now
+                else:
+                    post.setdefault('created_at', now)
+                    post['updated_at'] = now
+                    post.setdefault('published', True)
+                    post.setdefault('read_minutes', 4)
+                    posts.insert(0, post)
+                seo_bake.save_blog_posts(posts)
+                files = seo_bake.bake_board()
+                self._json({'ok': True, 'files': files})
+            except Exception as e:
+                self._json({'ok': False, 'error': str(e)}, 400)
+            return
+        if path == '/api/board-delete':
+            try:
+                d = self._body()
+                slug = (d.get('slug') or '').strip()
+                posts = [p for p in seo_bake.blog_posts() if p.get('slug') != slug]
+                seo_bake.save_blog_posts(posts)
+                f = os.path.join(ROOT, f'blog-{slug}.html')
+                if re.match(r'^[a-z0-9-]+$', slug) and os.path.isfile(f):
+                    os.remove(f)
+                seo_bake.bake_board()
+                self._json({'ok': True})
+            except Exception as e:
+                self._json({'ok': False, 'error': str(e)}, 400)
+            return
+
         # ---------- 설정 저장+굽기 (headCode·파비콘·og·SNS) ----------
         if path == '/api/settings':
             try:
                 d = self._body()
                 st = seo_bake.settings()
                 for k in ('domain', 'siteName', 'headCode',
-                          'snsKakao', 'snsInstagram', 'snsBlog', 'snsPhone'):
+                          'snsKakao', 'snsInstagram', 'snsBlog', 'snsPhone',
+                          'snsNaverTalk', 'snsInquiry', 'channelTalkKey',
+                          'mailEndpoint', 'mailTo'):
                     if k in d:
                         st[k] = d[k]
                 # 파비콘/OG 이미지: base64 업로드
@@ -136,9 +182,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 item = d.get('image') or {}
                 if not old_src or not item.get('data'):
                     raise ValueError('oldSrc/image 필요')
+                upload_only = old_src == '__upload_only__'
                 os.makedirs(UPLOAD_DIR, exist_ok=True)
                 ext = os.path.splitext(item.get('name', ''))[1].lower() or '.jpg'
-                if ext not in ('.jpg', '.jpeg', '.png', '.webp', '.gif'):
+                if ext not in ('.jpg', '.jpeg', '.png', '.webp', '.gif', '.mp4', '.webm'):
                     ext = '.jpg'
                 name = 'rp_' + hashlib.md5((item.get('name', '') + str(time.time())).encode()).hexdigest()[:12] + ext
                 dst = os.path.join(UPLOAD_DIR, name)
@@ -152,6 +199,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 except Exception:
                     pass
                 new_src = './images/uploads/' + name
+                if upload_only:   # 업로드만 하고 치환은 안 함 (게시판 썸네일 등)
+                    self._json({'ok': True, 'newSrc': new_src, 'files': []})
+                    return
                 # 같은 src 를 쓰는 모든 루트 페이지에서 교체
                 changed = []
                 for fn in sorted(os.listdir(ROOT)):

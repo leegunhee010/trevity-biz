@@ -62,37 +62,75 @@
     else { if(editing) finish(false); clearHl(); }
   }
 
-  /* ---------- 이미지 교체 ---------- */
-  function isImgTarget(el){
-    return el && el.tagName === 'IMG' && el.getAttribute('src') &&
-           !el.closest('#tvedit-bar') && el.getAttribute('src').indexOf('data:') !== 0;
+  /* ---------- 이미지·영상·배경 교체 ----------
+     대상: <img src>, <video src/poster>, style="background-image:url(...)" 인 요소.
+     교체하면 같은 주소를 쓰는 모든 페이지 파일에 반영된다. */
+  function bgUrl(el){
+    const st = el.getAttribute && el.getAttribute('style');
+    if(!st) return null;
+    const m = st.match(/background(?:-image)?\s*:[^;]*url\(\s*['"]?([^'")]+)['"]?\s*\)/);
+    return m ? m[1] : null;
   }
-  async function replaceImage(img){
-    const inp = document.createElement('input');
-    inp.type = 'file'; inp.accept = 'image/*';
-    inp.onchange = () => {
-      const f = inp.files && inp.files[0];
-      if(!f) return;
-      const fr = new FileReader();
-      fr.onload = async () => {
-        say('이미지 저장 중…', 8000);
-        try{
-          const page = location.pathname.replace(/^\//,'') || 'index.html';
-          const r = await fetch('/api/image-replace', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ page, oldSrc: img.getAttribute('src'), image: { name: f.name, data: fr.result } }),
-          });
-          const j = await r.json();
-          if(j.ok){
-            img.src = j.newSrc;
-            const files = j.files || [];
-            say(`✅ 이미지 교체됨 — ${files.length}개 파일 반영`);
-          } else say('⚠️ 교체 실패: ' + (j.error || '파일에서 원본 주소를 찾지 못했습니다'), 6000);
-        }catch(err){ say('⚠️ 교체 실패: ' + (err.message||err), 6000); }
-      };
-      fr.readAsDataURL(f);
+  function mediaTarget(el){
+    // 클릭 지점에서 위로 올라가며 img/video/배경이미지 요소를 찾는다
+    let cur = el;
+    for(let i=0; cur && cur !== document.body && i < 5; i++){
+      if(cur.tagName === 'IMG' && cur.getAttribute('src') && cur.getAttribute('src').indexOf('data:') !== 0)
+        return { el: cur, kind: 'img', src: cur.getAttribute('src') };
+      if(cur.tagName === 'VIDEO')
+        return { el: cur, kind: 'video', src: cur.getAttribute('src'), poster: cur.getAttribute('poster') };
+      const b = bgUrl(cur);
+      if(b && b.indexOf('data:') !== 0) return { el: cur, kind: 'bg', src: b };
+      cur = cur.parentElement;
+    }
+    return null;
+  }
+  function sendReplace(oldSrc, file, after){
+    const fr = new FileReader();
+    fr.onload = async () => {
+      say('저장 중…', 12000);
+      try{
+        const page = location.pathname.replace(/^\//,'') || 'index.html';
+        const r = await fetch('/api/image-replace', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ page, oldSrc, image: { name: file.name, data: fr.result } }),
+        });
+        const j = await r.json();
+        if(j.ok){ after(j.newSrc); say(`✅ 교체됨 — ${(j.files||[]).length}개 파일 반영`); }
+        else say('⚠️ 교체 실패: ' + (j.error || '파일에서 원본 주소를 찾지 못했습니다'), 6000);
+      }catch(err){ say('⚠️ 교체 실패: ' + (err.message||err), 6000); }
     };
+    fr.readAsDataURL(file);
+  }
+  function pickFile(accept, cb){
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = accept;
+    inp.onchange = () => { if(inp.files && inp.files[0]) cb(inp.files[0]); };
     inp.click();
+  }
+  function replaceMedia(t){
+    if(t.kind === 'img'){
+      pickFile('image/*', f => sendReplace(t.src, f, ns => { t.el.src = ns; }));
+      return;
+    }
+    if(t.kind === 'bg'){
+      pickFile('image/*', f => sendReplace(t.src, f, ns => {
+        t.el.style.backgroundImage = "url('" + ns + "')";
+      }));
+      return;
+    }
+    if(t.kind === 'video'){
+      // 포스터/영상 중 선택
+      const what = t.poster ? (confirm('확인 = 영상(mp4) 교체 / 취소 = 썸네일(포스터) 교체') ? 'src' : 'poster') : 'src';
+      if(what === 'src'){
+        pickFile('video/mp4,video/webm', f => {
+          if(f.size > 40*1024*1024){ say('⚠️ 영상은 40MB 이하만 가능합니다', 5000); return; }
+          sendReplace(t.src, f, ns => { t.el.src = ns; t.el.load && t.el.load(); });
+        });
+      } else {
+        pickFile('image/*', f => sendReplace(t.poster, f, ns => { t.el.poster = ns; }));
+      }
+    }
   }
 
   let hlEl = null;
@@ -117,19 +155,22 @@
       finish(true);
       return;
     }
-    if(isImgTarget(e.target)){
-      e.preventDefault(); e.stopPropagation();
-      replaceImage(e.target);
-      return;
-    }
+    // 텍스트 leaf 우선, 아니면 이미지·영상·배경
     let el = e.target;
     while(el && el !== document.body){
       if(isTarget(el)) break;
       el = el.parentElement;
     }
-    if(!el || el === document.body) return;
-    e.preventDefault(); e.stopPropagation();
-    start(el);
+    if(el && el !== document.body){
+      e.preventDefault(); e.stopPropagation();
+      start(el);
+      return;
+    }
+    const mt = mediaTarget(e.target);
+    if(mt){
+      e.preventDefault(); e.stopPropagation();
+      replaceMedia(mt);
+    }
   }, true);
 
   document.addEventListener('keydown', e => {

@@ -42,6 +42,9 @@ DEFAULT_SETTINGS = {
     "favicon": "",
     "ogImage": "",
     "snsKakao": "", "snsInstagram": "", "snsBlog": "", "snsPhone": "",
+    "snsNaverTalk": "", "snsInquiry": False,
+    "channelTalkKey": "",
+    "mailEndpoint": "", "mailTo": "",
 }
 
 
@@ -264,7 +267,12 @@ def bake_technical():
         _write(p, s)
         changed += 1
 
-    # 7) sitemap.xml
+    # 7) sitemap.xml (게시판 정적 글 페이지 포함)
+    for c in blog_posts():
+        if c.get("published") is False:
+            continue
+        if (ROOT / f"blog-{c.get('slug','')}.html").exists():
+            urls.append((f"{domain}/blog-{c['slug']}.html", 0.6, "yearly"))
     sm = ['<?xml version="1.0" encoding="UTF-8"?>',
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for url, prio, freq in urls:
@@ -283,7 +291,7 @@ def bake_technical():
     for c in blog_posts():
         if c.get("published") is False:
             continue
-        link = f"{domain}/blog-post.html?slug={c.get('slug','')}"
+        link = f"{domain}/blog-{c.get('slug','')}.html"
         items.append(f"    <item><title>{c.get('title','')}</title>"
                      f"<link>{link}</link>"
                      f"<description>{c.get('excerpt','')}</description>"
@@ -330,7 +338,28 @@ def bake_settings():
                            lambda m: m.group(1) + f"{domain}/{ogimage}" + m.group(2), s)
             else:
                 s = s.replace("</head>", f'<meta property="og:image" content="{domain}/{ogimage}"/>\n</head>', 1)
+        # 채널톡 플러그인 (전 페이지, 마커 재실행 안전)
+        s = re.sub(r"<!--chtalk-->.*?<!--/chtalk-->", "", s, flags=re.S)
+        key = (st.get("channelTalkKey") or "").strip()
+        if key:
+            ch = ('<!--chtalk--><script>(function(){var w=window;if(w.ChannelIO)return;var ch=function(){ch.c(arguments)};'
+                  'ch.q=[];ch.c=function(a){ch.q.push(a)};w.ChannelIO=ch;function l(){if(w.ChannelIOInitialized)return;'
+                  'w.ChannelIOInitialized=true;var x=document.createElement("script");x.type="text/javascript";x.async=true;'
+                  'x.src="https://cdn.channel.io/plugin/ch-plugin-web.js";var s=document.getElementsByTagName("script")[0];'
+                  's.parentNode.insertBefore(x,s)}if(document.readyState==="complete"){l()}else{w.addEventListener("load",l)}})();'
+                  f'ChannelIO("boot",{{"pluginKey":"{key}"}});</script><!--/chtalk-->')
+            s = s.replace("</body>", ch + "\n</body>", 1)
         _write(p, s)
+
+    # 문의 메일 발송 설정 → inquiry.html 에 주입
+    mp = ROOT / "inquiry.html"
+    if mp.exists():
+        s = _read(mp)
+        s = re.sub(r"<!--mail-cfg-->.*?<!--/mail-cfg-->", "", s, flags=re.S)
+        ep = (st.get("mailEndpoint") or "").strip()
+        if ep:
+            s = s.replace("</head>", f'<!--mail-cfg--><script>window.TV_MAIL_ENDPOINT={json.dumps(ep)};</script><!--/mail-cfg-->\n</head>', 1)
+        _write(mp, s)
     return len(_all_html_files())
 
 
@@ -340,7 +369,15 @@ def bake_sns():
     insta = (st.get("snsInstagram") or "").strip()
     blog = (st.get("snsBlog") or "").strip()
     phone = (st.get("snsPhone") or "").strip()
+    ntalk = (st.get("snsNaverTalk") or "").strip()
+    inquiry_btn = bool(st.get("snsInquiry"))
     btns = []
+    if inquiry_btn:
+        btns.append('<a class="sns-fab sns-inq" href="./inquiry.html" aria-label="문의하기">'
+                    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2">'
+                    '<path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.8-.8L3 20l1-4.9a8.4 8.4 0 1 1 17-3.6z"/></svg></a>')
+    if ntalk:
+        btns.append(f'<a class="sns-fab sns-ntalk" href="{ntalk}" target="_blank" rel="noopener" aria-label="네이버 톡톡"><b>톡톡</b></a>')
     if kakao:
         btns.append(f'<a class="sns-fab sns-kakao" href="{kakao}" target="_blank" rel="noopener" aria-label="카카오톡 상담">'
                     '<svg viewBox="0 0 24 24" width="24" height="24"><path fill="#3C1E1E" d="M12 3C6.5 3 2 6.5 2 10.8c0 2.8 1.9 5.2 4.7 6.6-.2.7-.7 2.6-.8 3-.1.5.2.5.4.4.2-.1 2.6-1.8 3.6-2.5.7.1 1.4.2 2.1.2 5.5 0 10-3.5 10-7.8S17.5 3 12 3z"/></svg></a>')
@@ -362,6 +399,8 @@ def bake_sns():
                '.sns-fab:hover{transform:translateY(-3px)}'
                '.sns-kakao{background:#FEE500}.sns-insta{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)}'
                '.sns-blog{background:#03C75A}.sns-blog b{color:#fff;font-size:13px;font-weight:800;font-style:normal}'
+               '.sns-ntalk{background:#03C75A}.sns-ntalk b{color:#fff;font-size:12px;font-weight:800;font-style:normal}'
+               '.sns-inq{background:#fa6781}'
                '.sns-phone{background:#fa6781}'
                '@media(max-width:767px){.sns-float{right:12px;bottom:16px}.sns-fab{width:48px;height:48px}}</style>')
         widget = "<!--sns-float-->" + css + '<div class="sns-float">' + "".join(btns) + "</div><!--/sns-float-->"
@@ -372,6 +411,104 @@ def bake_sns():
             s = s.replace("</body>", widget + "\n</body>", 1)
         _write(p, s)
     return len(btns)
+
+
+# ---------- 게시판(블로그) — data.js 저장 + 정적 페이지 굽기 ----------
+def save_blog_posts(posts):
+    p = ROOT / "assets" / "js" / "data.js"
+    s = _read(p)
+    new = "const TV_BLOG_POSTS = " + json.dumps(posts, ensure_ascii=False) + ";"
+    s = re.sub(r"const TV_BLOG_POSTS = \[.*?\];", lambda m: new, s, count=1, flags=re.S)
+    _write(p, s)
+
+
+def _blog_chrome():
+    """blog.html에서 head 링크·스타일·헤더·푸터를 추출해 정적 글 페이지 틀로 쓴다."""
+    s = _read(ROOT / "blog.html")
+    head_end = s.find("</head>")
+    head = s[:head_end]
+    links = "\n".join(re.findall(r'<link[^>]*>', head))
+    styles = "\n".join(re.findall(r"<style[^>]*>.*?</style>", head, re.S))
+    hs = s.find("<header"); he = s.find("</header>") + len("</header>")
+    fs = s.find("<footer"); fe = s.find("</footer>") + len("</footer>")
+    return links, styles, s[hs:he], s[fs:fe]
+
+
+def bake_post(post):
+    """글 1건 → blog-<slug>.html 정적 페이지 (Article JSON-LD 포함, AI 읽기)."""
+    st = settings()
+    domain = st["domain"].rstrip("/")
+    links, styles, header, footer = _blog_chrome()
+    slug = post["slug"]
+    url = f"{domain}/blog-{slug}.html"
+    title = post.get("title", "")
+    desc = re.sub(r"<[^>]+>", " ", post.get("excerpt", "")).strip()
+    thumb = post.get("thumbnail_url", "")
+    date = str(post.get("created_at", ""))[:10]
+    ld = {"@context": "https://schema.org", "@type": "Article",
+          "headline": title, "description": desc,
+          "datePublished": date, "dateModified": str(post.get("updated_at", ""))[:10] or date,
+          "author": {"@type": "Organization", "name": "트래비티 TREVITY"},
+          "publisher": {"@type": "Organization", "name": "주식회사 퍼스트마케팅컴퍼니"},
+          "mainEntityOfPage": url}
+    if thumb:
+        ld["image"] = domain + "/" + thumb.lstrip("./")
+    html = f'''<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{title} | 트래비티</title>
+<meta name="description" content="{desc}"/>
+<meta property="og:title" content="{title}"/>
+<meta property="og:description" content="{desc}"/>
+<meta property="og:type" content="article"/>
+<meta property="og:url" content="{url}"/>
+<link rel="canonical" href="{url}">
+<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>
+{links}
+{styles}
+</head>
+<body class="max-[767px]:min-w-[360px] min-[767px]:min-w-[1440px]">
+{header}
+<div class="tv-bloghero"><h1>{post.get("category", "블로그")}</h1></div>
+<div style="max-width:760px;margin:0 auto;padding:40px 20px 100px;word-break:keep-all">
+  <article>
+    <h1 style="font-size:28px;font-weight:800;margin-bottom:10px;line-height:1.4">{title}</h1>
+    <p style="color:#8B95A1;font-size:13px;margin-bottom:28px">{date} · {post.get("read_minutes", 4)}분 분량</p>
+    {f'<img src="{thumb}" alt="" style="width:100%;border-radius:12px;margin-bottom:28px">' if thumb else ''}
+    <div style="line-height:1.85;font-size:16px">{post.get("body_html", "")}</div>
+    <p style="margin-top:40px"><a href="./blog.html" style="color:#fa6781;font-weight:700;text-decoration:none">← 블로그 목록으로</a></p>
+  </article>
+</div>
+{footer}
+</body>
+</html>'''
+    _write(ROOT / f"blog-{slug}.html", html)
+    return f"blog-{slug}.html"
+
+
+def bake_board():
+    """전체 글 굽기: 정적 글 페이지 + blog.html 목록 카드(정적, 크롤러용) + rss."""
+    posts = [p for p in blog_posts() if p.get("published") is not False]
+    posts.sort(key=lambda p: str(p.get("created_at", "")), reverse=True)
+    files = [bake_post(p) for p in posts]
+    # blog.html .tv-grid 에 정적 카드 굽기 (JS 렌더는 같은 내용으로 다시 그림)
+    bp = ROOT / "blog.html"
+    s = _read(bp)
+    cards = "".join(
+        f'<article class="tv-card" data-cat="{p.get("category","")}" data-title="{p.get("title","")}">'
+        f'<a href="./blog-{p["slug"]}.html">'
+        f'<div class="tv-thumb"><img src="{p.get("thumbnail_url","")}" alt="{p.get("title","")}" loading="lazy"/></div>'
+        f'<div class="tv-card-body"><span class="tv-chip">{p.get("category","")}</span><h3>{p.get("title","")}</h3>'
+        f'<div class="tv-meta"><time>{str(p.get("created_at",""))[:10]}</time><span>{p.get("read_minutes",4)}분 분량</span></div></div>'
+        f'</a></article>' for p in posts)
+    m = re.search(r'(<div class="tv-grid">)(.*?)(</div>)', s, re.S)
+    if m:
+        s = s[:m.start()] + m.group(1) + cards + m.group(3) + s[m.end():]
+        _write(bp, s)
+    # rss 갱신
+    bake_technical()
+    return files
 
 
 if __name__ == "__main__":

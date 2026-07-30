@@ -44,6 +44,7 @@ a.lnk{color:var(--pri);font-weight:700;text-decoration:none;font-size:13px}
   <div class="top">
     <h1>TRE<b>VITY</b> SEO 관리</h1><span class="sp"></span>
     <a class="lnk" href="/" target="_blank">사이트 열기 ↗</a>
+    <a class="lnk" href="/board.html">게시판 관리</a>
     <a class="lnk" href="/admin/" target="_blank">관리자 ↗</a>
   </div>
 
@@ -67,12 +68,23 @@ a.lnk{color:var(--pri);font-weight:700;text-decoration:none;font-size:13px}
       <div class="fld"><label>파비콘 업로드</label><input type="file" id="st-favicon" accept=".png,.ico,.svg,.jpg,.webp"></div>
       <div class="fld"><label>대표 OG 이미지 업로드 (공유 미리보기)</label><input type="file" id="st-ogimage" accept="image/*"></div>
     </div>
-    <h3 style="margin-top:18px">플로팅 SNS 버튼 (값 있는 것만 노출)</h3>
+    <h3 style="margin-top:18px">플로팅 문의 버튼 (값 있는 것만 노출)</h3>
     <div class="grid2">
       <div class="fld"><label>카카오톡 채널 URL</label><input id="st-snsKakao" placeholder="https://pf.kakao.com/..."></div>
       <div class="fld"><label>인스타그램 URL</label><input id="st-snsInstagram" placeholder="https://instagram.com/trevity__"></div>
+      <div class="fld"><label>네이버 톡톡 URL</label><input id="st-snsNaverTalk" placeholder="https://talk.naver.com/..."></div>
       <div class="fld"><label>블로그 URL</label><input id="st-snsBlog"></div>
       <div class="fld"><label>전화번호</label><input id="st-snsPhone" placeholder="070-4212-8266"></div>
+      <div class="fld"><label>문의하기 버튼 (inquiry.html)</label><select id="st-snsInquiry"><option value="">끔</option><option value="1">켬</option></select></div>
+    </div>
+    <div class="fld"><label>채널톡 플러그인 키 (넣으면 전 페이지에 채널톡 위젯 설치)</label>
+      <input id="st-channelTalkKey" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"></div>
+    <h3 style="margin-top:18px">문의 메일 알림</h3>
+    <p class="note">구글 Apps Script 웹앱 주소(/exec)를 넣으면 inquiry.html 접수 시 그 주소로도 전송됩니다
+      (시트 저장 + 메일 발송은 Apps Script 쪽 코드가 담당 — <b>docs/mail-apps-script.gs</b> 참고, 이전 트래비티 랜딩과 같은 방식).</p>
+    <div class="grid2">
+      <div class="fld"><label>Apps Script 웹앱 URL (/exec)</label><input id="st-mailEndpoint" placeholder="https://script.google.com/macros/s/.../exec"></div>
+      <div class="fld"><label>수신 메일 (Apps Script 코드에서 사용)</label><input id="st-mailTo" placeholder="notice@trevity.com"></div>
     </div>
     <button class="btn btn-pri" onclick="saveSettings(this)">설정 저장 · 전 페이지 굽기</button>
   </div>
@@ -104,9 +116,10 @@ async function runTech(btn){
 
 async function loadSettings(){
   const st = await fetch('/api/settings').then(r=>r.json());
-  for(const k of ['domain','siteName','headCode','snsKakao','snsInstagram','snsBlog','snsPhone']){
+  for(const k of ['domain','siteName','headCode','snsKakao','snsInstagram','snsBlog','snsPhone','snsNaverTalk','channelTalkKey','mailEndpoint','mailTo']){
     const el = document.getElementById('st-'+k); if(el) el.value = st[k]||'';
   }
+  document.getElementById('st-snsInquiry').value = st.snsInquiry ? '1' : '';
 }
 function readFile(input){
   return new Promise(res=>{
@@ -120,8 +133,9 @@ function readFile(input){
 async function saveSettings(btn){
   btn.disabled = true;
   const body = {};
-  for(const k of ['domain','siteName','headCode','snsKakao','snsInstagram','snsBlog','snsPhone'])
+  for(const k of ['domain','siteName','headCode','snsKakao','snsInstagram','snsBlog','snsPhone','snsNaverTalk','channelTalkKey','mailEndpoint','mailTo'])
     body[k] = document.getElementById('st-'+k).value;
+  body.snsInquiry = !!document.getElementById('st-snsInquiry').value;
   body.faviconData = await readFile(document.getElementById('st-favicon'));
   body.ogImageData = await readFile(document.getElementById('st-ogimage'));
   try{

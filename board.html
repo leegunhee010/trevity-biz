@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>TREVITY 게시판 관리</title>
+<style>
+:root{--pri:#fa6781;--pri-dark:#e0536c;--bg:#F6F7F9;--line:#E5E8EB;--ink:#191F28;--sub:#8B95A1}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);margin:0;font-family:Pretendard,-apple-system,'Segoe UI',sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:36px 20px 80px}
+h1{font-size:24px;font-weight:800;letter-spacing:-.03em}
+h1 b{color:var(--pri)}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;margin-bottom:16px}
+.note{font-size:13px;color:var(--sub);line-height:1.7;margin:0 0 14px}
+.fld{margin-bottom:12px}
+.fld label{display:block;font-size:13px;font-weight:600;color:#4E5968;margin-bottom:5px}
+.fld input,.fld textarea,.fld select{width:100%;border:1px solid var(--line);border-radius:7px;padding:10px 12px;font-size:14px;font-family:inherit}
+.fld textarea{resize:vertical;line-height:1.6}
+#f-body{min-height:340px;font-family:Consolas,monospace;font-size:13px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid4{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:12px}
+@media(max-width:760px){.grid2,.grid4{grid-template-columns:1fr}}
+.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-pri{background:var(--pri);color:#fff}.btn-pri:hover{background:var(--pri-dark)}
+.btn-ghost{background:#fff;border:1px solid var(--line);color:#4E5968}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:12px;color:var(--sub);text-align:left;padding:9px;border-bottom:1px solid var(--line)}
+td{padding:11px 9px;border-bottom:1px solid var(--line);vertical-align:middle}
+td img{width:52px;height:38px;object-fit:cover;border-radius:6px;background:var(--bg)}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.top .sp{flex:1}
+a.lnk{color:var(--pri);font-weight:700;text-decoration:none;font-size:13px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);opacity:0;background:#191F28;color:#fff;
+  padding:12px 20px;border-radius:8px;font-size:13px;z-index:200;transition:opacity .25s;pointer-events:none}
+.toast.show{opacity:1}
+.hidden{display:none}
+.hint{font-size:12px;color:var(--sub);margin-top:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>TRE<b>VITY</b> 게시판 관리</h1><span class="sp"></span>
+    <a class="lnk" href="/blog.html" target="_blank">블로그 보기 ↗</a>
+    <a class="lnk" href="/seo.html">SEO 관리</a>
+  </div>
+
+  <div class="card" id="list-card">
+    <div class="top" style="margin-bottom:10px"><h3 style="margin:0;font-size:16px">글 목록</h3><span class="sp"></span>
+      <button class="btn btn-pri" onclick="openForm()">+ 새 글 작성</button></div>
+    <p class="note">저장하면 <b>blog-슬러그.html 정적 페이지로 즉시 구워지고</b> blog.html 목록·sitemap·rss에 반영됩니다. 본문에 HTML을 그대로 넣을 수 있습니다.</p>
+    <table><thead><tr><th style="width:60px">썸네일</th><th>제목</th><th>분류</th><th>발행일</th><th style="width:150px"></th></tr></thead>
+    <tbody id="rows"></tbody></table>
+  </div>
+
+  <div class="card hidden" id="form-card">
+    <div class="top" style="margin-bottom:10px"><h3 style="margin:0;font-size:16px" id="form-title">새 글 작성</h3><span class="sp"></span>
+      <button class="btn btn-ghost" onclick="closeForm()">취소</button>
+      <button class="btn btn-pri" onclick="save(this)">저장 · 정적 페이지 굽기</button></div>
+    <div class="grid2">
+      <div class="fld"><label>제목</label><input id="f-title"></div>
+      <div class="fld"><label>URL 슬러그 (영문 소문자·숫자·하이픈)</label><input id="f-slug">
+        <div class="hint">저장 시 blog-슬러그.html 로 생성됩니다. 발행 후 변경하면 기존 URL이 깨집니다.</div></div>
+    </div>
+    <div class="grid4">
+      <div class="fld"><label>분류</label><select id="f-cat">
+        <option>베트남 시장</option><option>인플루언서 부킹</option><option>틱톡 마케팅</option><option>캠페인 사례</option></select></div>
+      <div class="fld"><label>발행일</label><input id="f-date" type="date"></div>
+      <div class="fld"><label>읽는 시간(분)</label><input id="f-min" type="number" value="4"></div>
+      <div class="fld"><label>발행 상태</label><select id="f-pub"><option value="1">발행</option><option value="0">숨김</option></select></div>
+    </div>
+    <div class="fld"><label>썸네일 이미지 (업로드 또는 경로)</label>
+      <input type="file" id="f-thumb-file" accept="image/*" onchange="thumbPick(this)">
+      <input id="f-thumb" placeholder="./images/blog/thumb.png" style="margin-top:6px">
+    </div>
+    <div class="fld"><label>요약 (목록 카드·메타 설명)</label><textarea id="f-excerpt" style="min-height:56px"></textarea></div>
+    <div class="fld"><label>본문 HTML — 그대로 페이지에 들어갑니다 (&lt;h2&gt;·&lt;p&gt;·&lt;img&gt;·표·iframe 등 자유)</label>
+      <textarea id="f-body" placeholder="<h2>소제목</h2>&#10;<p>본문 문단…</p>"></textarea></div>
+    <div class="fld"><label>미리보기</label>
+      <iframe id="f-preview" style="width:100%;height:300px;border:1px solid var(--line);border-radius:8px;background:#fff"></iframe>
+      <button class="btn btn-ghost" style="margin-top:6px" onclick="preview()">미리보기 새로고침</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+let posts = [];
+let editingSlug = null;
+function toast(t){ const el=document.getElementById('toast'); el.textContent=t; el.classList.add('show');
+  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'), 3000); }
+function esc(s){ return String(s??'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+async function load(){
+  posts = await fetch('/api/board').then(r=>r.json());
+  document.getElementById('rows').innerHTML = posts.map(p=>`
+    <tr><td>${p.thumbnail_url?`<img src="${esc(p.thumbnail_url)}">`:''}</td>
+    <td><b>${esc(p.title)}</b><div style="font-size:11px;color:var(--sub)">blog-${esc(p.slug)}.html ${p.published===false?'· 숨김':''}</div></td>
+    <td>${esc(p.category)}</td><td>${esc(String(p.created_at||'').slice(0,10))}</td>
+    <td><a class="lnk" href="/blog-${esc(p.slug)}.html" target="_blank">보기</a>
+      <button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="openForm('${esc(p.slug)}')">수정</button>
+      <button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="del('${esc(p.slug)}')">삭제</button></td></tr>`).join('')
+    || '<tr><td colspan="5" style="text-align:center;color:var(--sub);padding:30px">글이 없습니다</td></tr>';
+}
+function openForm(slug){
+  editingSlug = slug || null;
+  const p = slug ? posts.find(x=>x.slug===slug) : null;
+  document.getElementById('form-title').textContent = p ? '글 수정' : '새 글 작성';
+  document.getElementById('f-title').value = p?p.title:'';
+  document.getElementById('f-slug').value = p?p.slug:'';
+  document.getElementById('f-slug').readOnly = !!p;
+  document.getElementById('f-cat').value = p?p.category:'베트남 시장';
+  document.getElementById('f-date').value = p?String(p.created_at||'').slice(0,10):new Date().toISOString().slice(0,10);
+  document.getElementById('f-min').value = p?(p.read_minutes||4):4;
+  document.getElementById('f-pub').value = (p && p.published===false)?'0':'1';
+  document.getElementById('f-thumb').value = p?(p.thumbnail_url||''):'';
+  document.getElementById('f-excerpt').value = p?(p.excerpt||''):'';
+  document.getElementById('f-body').value = p?(p.body_html||''):'';
+  document.getElementById('form-card').classList.remove('hidden');
+  document.getElementById('list-card').classList.add('hidden');
+  preview();
+}
+function closeForm(){
+  document.getElementById('form-card').classList.add('hidden');
+  document.getElementById('list-card').classList.remove('hidden');
+}
+function preview(){
+  const doc = document.getElementById('f-preview').contentDocument;
+  doc.open();
+  doc.write('<meta charset="utf-8"><body style="font-family:Pretendard,sans-serif;line-height:1.85;padding:14px;word-break:keep-all">'
+    + document.getElementById('f-body').value + '</body>');
+  doc.close();
+}
+function thumbPick(input){
+  const f = input.files && input.files[0];
+  if(!f) return;
+  const fr = new FileReader();
+  fr.onload = async () => {
+    const r = await fetch('/api/image-replace', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({page:'blog.html', oldSrc:'__upload_only__', image:{name:f.name, data:fr.result}})}).then(r=>r.json());
+    if(r.newSrc){ document.getElementById('f-thumb').value = r.newSrc; toast('썸네일 업로드됨'); }
+    else toast('업로드 실패');
+  };
+  fr.readAsDataURL(f);
+}
+async function save(btn){
+  const slug = document.getElementById('f-slug').value.trim();
+  const title = document.getElementById('f-title').value.trim();
+  if(!title){ toast('제목을 입력하세요'); return; }
+  if(!/^[a-z0-9-]+$/.test(slug)){ toast('슬러그는 영문 소문자·숫자·하이픈만'); return; }
+  btn.disabled = true; btn.textContent = '굽는 중…';
+  try{
+    const r = await fetch('/api/board', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({post:{
+        slug, title,
+        category: document.getElementById('f-cat').value,
+        created_at: document.getElementById('f-date').value,
+        read_minutes: Number(document.getElementById('f-min').value)||4,
+        published: document.getElementById('f-pub').value==='1',
+        thumbnail_url: document.getElementById('f-thumb').value,
+        excerpt: document.getElementById('f-excerpt').value,
+        body_html: document.getElementById('f-body').value,
+      }})}).then(r=>r.json());
+    if(!r.ok) throw new Error(r.error||'실패');
+    toast(`✅ 저장됨 — 정적 페이지 ${r.files.length}건 굽기 완료`);
+    closeForm(); load();
+  }catch(e){ toast('실패: '+e.message); }
+  btn.disabled = false; btn.textContent = '저장 · 정적 페이지 굽기';
+}
+async function del(slug){
+  if(!confirm('이 글과 blog-'+slug+'.html 파일을 삭제할까요?')) return;
+  const r = await fetch('/api/board-delete', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({slug})}).then(r=>r.json());
+  if(r.ok){ toast('삭제됨'); load(); } else toast('실패: '+(r.error||''));
+}
+load();
+</script>
+</body>
+</html>

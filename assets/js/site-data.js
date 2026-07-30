@@ -67,7 +67,7 @@ function renderBlogList(){
 
   grid.innerHTML = posts.map(p => `
     <article class="tv-card" data-cat="${esc(p.category)}" data-title="${esc(p.title)}">
-      <a href="./blog-post.html?slug=${encodeURIComponent(p.slug)}">
+      <a href="./blog-${encodeURIComponent(p.slug)}.html">
         <div class="tv-thumb"><img src="${esc(TvImg.resolve(p.thumbnail_url))}" alt="${esc(p.title)}" loading="lazy"></div>
         <div class="tv-card-body"><span class="tv-chip">${esc(p.category)}</span><h3>${esc(p.title)}</h3>
         <div class="tv-meta"><time>${esc(String(p.created_at||'').slice(0,10))}</time><span>${p.read_minutes||4}분 분량</span></div></div>
