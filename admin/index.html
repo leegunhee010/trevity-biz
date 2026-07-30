@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TREVITY 관리자</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css">
+<link rel="icon" href="../trevity-logo.png">
+<style>
+:root{
+  --tv-primary:#fa6781; --tv-primary-dark:#e0536c; --tv-primary-soft:#fff0f3;
+  --tv-danger:#E03131; --r-pill:999px;
+  --font-body:'Pretendard',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --sb-w:236px; --adm-bg:#F6F7F9; --adm-line:#E5E8EB; --adm-ink:#191F28; --adm-sub:#8B95A1;
+}
+*{box-sizing:border-box}
+body{background:var(--adm-bg);color:var(--adm-ink);font-family:var(--font-body);margin:0}
+button{font-family:var(--font-body);cursor:pointer;border:none;background:none;color:inherit}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 22px;
+  border-radius:8px;font-size:14px;font-weight:700;transition:all .12s}
+.btn-primary{background:var(--tv-primary);color:#fff}
+.btn-primary:hover{background:var(--tv-primary-dark)}
+.btn-ghost{background:#fff;color:#4E5968;border:1px solid var(--adm-line)}
+.btn-ghost:hover{border-color:var(--adm-ink);color:var(--adm-ink)}
+.btn-block{width:100%}
+.btn-sm{padding:8px 14px;font-size:13px}
+
+.sb{position:fixed;top:0;left:0;bottom:0;width:var(--sb-w);background:#fff;border-right:1px solid var(--adm-line);
+  display:flex;flex-direction:column;z-index:120;transition:transform .22s}
+.sb-brand{padding:22px 20px 18px;border-bottom:1px solid var(--adm-line)}
+.sb-brand .lg{font-size:21px;font-weight:800;letter-spacing:-.03em;color:var(--adm-ink)}
+.sb-brand .lg b{color:var(--tv-primary)}
+.sb-brand .role{display:inline-block;margin-top:7px;font-size:11px;font-weight:700;color:var(--tv-primary);
+  background:var(--tv-primary-soft);border-radius:var(--r-pill);padding:3px 9px}
+.sb-nav{flex:1;overflow-y:auto;padding:12px 12px 20px}
+.sb-nav .grp{font-size:11px;font-weight:700;color:var(--adm-sub);letter-spacing:.04em;padding:14px 10px 7px}
+.sb-nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:11px 12px;
+  border-radius:8px;font-size:14px;font-weight:600;color:#4E5968;margin-bottom:2px;transition:background .12s}
+.sb-nav button .cnt{margin-left:auto;font-size:11px;font-weight:700;background:var(--adm-bg);
+  color:var(--adm-sub);border-radius:var(--r-pill);padding:2px 8px}
+.sb-nav button:hover{background:var(--adm-bg)}
+.sb-nav button.on{background:var(--tv-primary);color:#fff}
+.sb-nav button.on .cnt{background:rgba(255,255,255,.24);color:#fff}
+.sb-foot{padding:14px;border-top:1px solid var(--adm-line);display:flex;gap:8px}
+.sb-foot a,.sb-foot button{flex:1;text-align:center;font-size:12px;font-weight:600;color:#4E5968;
+  border:1px solid var(--adm-line);border-radius:6px;padding:9px 6px}
+
+.mainarea{margin-left:var(--sb-w);min-height:100vh;display:flex;flex-direction:column}
+.topbar2{background:#fff;border-bottom:1px solid var(--adm-line);position:sticky;top:0;z-index:90;
+  display:flex;align-items:center;gap:14px;padding:0 26px;height:62px}
+.topbar2 h1{font-size:19px;font-weight:700;letter-spacing:-.02em}
+.topbar2 .desc{font-size:13px;color:var(--adm-sub)}
+.topbar2 .sp{flex:1}
+.burger{display:none;font-size:20px;color:var(--adm-ink)}
+.content{padding:24px 26px 60px;max-width:1180px;width:100%}
+
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+@media(max-width:900px){.kpi{grid-template-columns:repeat(2,1fr)}}
+.kpi-card{background:#fff;border:1px solid var(--adm-line);border-radius:12px;padding:18px 20px}
+.kpi-card .lbl{font-size:12px;font-weight:600;color:var(--adm-sub)}
+.kpi-card .num{font-size:28px;font-weight:800;letter-spacing:-.03em;margin-top:8px;line-height:1}
+.kpi-card .sub{font-size:12px;color:var(--adm-sub);margin-top:7px}
+
+.card{background:#fff;border:1px solid var(--adm-line);border-radius:12px;padding:20px 22px;margin-bottom:16px}
+.card-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.card-head h3{font-size:16px;font-weight:700}
+.card-head .sp{flex:1}
+.note{font-size:13px;color:var(--adm-sub);margin-bottom:16px;line-height:1.75}
+
+.tbl-wrap{overflow-x:auto;margin:0 -22px;padding:0 22px}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+th{font-size:12px;font-weight:600;color:var(--adm-sub);text-align:left;padding:10px;
+  border-bottom:1px solid var(--adm-line);white-space:nowrap}
+td{padding:13px 10px;border-bottom:1px solid var(--adm-line);vertical-align:middle}
+td .sub{font-size:12px;color:var(--adm-sub);margin-top:3px}
+tbody tr:hover{background:#FAFBFC}
+.empty-row td{text-align:center;color:var(--adm-sub);padding:44px;font-size:14px}
+
+.bar{display:flex;align-items:center;gap:9px;margin-bottom:16px;flex-wrap:wrap}
+.bar .grow{flex:1}
+.srch{border:1px solid var(--adm-line);border-radius:7px;padding:9px 12px;font-size:13px;min-width:200px}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.fgrid.two{grid-template-columns:repeat(2,1fr)}
+@media(max-width:900px){.fgrid,.fgrid.two{grid-template-columns:1fr}}
+.fld{margin-bottom:14px}
+.fld label{display:block;font-size:13px;font-weight:600;color:#4E5968;margin-bottom:6px}
+.fld input,.fld select,.fld textarea{width:100%;border:1px solid var(--adm-line);border-radius:7px;
+  padding:10px 12px;font-size:14px;font-family:var(--font-body)}
+.fld textarea{resize:vertical;min-height:74px;line-height:1.7}
+.sect{border-top:1px solid var(--adm-line);margin-top:22px;padding-top:20px}
+.sect h4{font-size:14px;font-weight:700;margin-bottom:14px}
+
+.upl{display:flex;gap:16px;align-items:flex-start;border:1px dashed var(--adm-line);
+  border-radius:10px;padding:14px;background:#FAFBFC}
+.upl.over{border-color:var(--tv-primary);background:var(--tv-primary-soft)}
+.upl-prev{width:176px;height:132px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#fff;
+  border:1px solid var(--adm-line);display:flex;align-items:center;justify-content:center}
+.upl-prev img{width:100%;height:100%;object-fit:cover;display:block}
+.upl-prev .ph{font-size:12px;color:var(--adm-sub)}
+.upl-side{flex:1;min-width:0}
+.upl-acts{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.upl-hint{font-size:12px;color:var(--adm-sub);line-height:1.65;margin:0}
+.upl-url{margin-top:12px}
+.upl-url summary{font-size:12px;color:var(--adm-sub);cursor:pointer;font-weight:600}
+
+.pill-st{display:inline-block;font-size:11px;font-weight:700;padding:4px 10px;border-radius:var(--r-pill)}
+.st-new{background:var(--tv-primary-soft);color:var(--tv-primary-dark)}
+.st-doing{background:#FFF4E0;color:#B7791F}
+.st-done{background:#EEF1F4;color:#6B7684}
+.thumb-sm{width:54px;height:41px;object-fit:cover;border-radius:6px;background:var(--adm-bg)}
+
+.login-wrap{max-width:380px;margin:0 auto;padding:100px 20px}
+.login-wrap .lg{font-size:30px;font-weight:800;letter-spacing:-.03em;text-align:center;margin-bottom:6px}
+.login-wrap .lg b{color:var(--tv-primary)}
+.login-wrap .desc{font-size:14px;color:var(--adm-sub);text-align:center;margin-bottom:26px}
+
+.rte{background:#fff;border:1px solid var(--adm-line);border-radius:0 0 7px 7px}
+.rte .ql-editor{min-height:220px;font-size:15px;line-height:1.8;font-family:var(--font-body)}
+.ql-toolbar.ql-snow{border:1px solid var(--adm-line);border-radius:7px 7px 0 0;background:#FAFBFC}
+.ql-container.ql-snow{border:0}
+
+.hidden{display:none!important}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);opacity:0;
+  background:#191F28;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;z-index:200;
+  transition:all .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.sb-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:110;display:none}
+@media(max-width:900px){
+  .sb{transform:translateX(-100%);box-shadow:0 0 40px rgba(0,0,0,.14)}
+  .sb.open{transform:translateX(0)}
+  .sb-backdrop.open{display:block}
+  .mainarea{margin-left:0}
+  .burger{display:block}
+  .content{padding:18px 16px 60px}
+  .topbar2{padding:0 16px}
+}
+</style>
+</head>
+<body>
+<div id="gate" class="login-wrap">
+  <div class="lg">TRE<b>VITY</b></div><p class="desc">관리자 콘솔</p>
+  <div class="card">
+    <div class="fld" id="gate-email-fld" style="display:none"><label>이메일</label><input id="gate-email" type="email"></div>
+    <div class="fld"><label>비밀번호</label><input id="gate-pw" type="password" onkeydown="if(event.key==='Enter')doAdminLogin()" autofocus>
+      <p class="hint" id="gate-hint" style="font-size:12px;color:var(--adm-sub);margin-top:5px">초기 비밀번호 <code>trevity2026</code> — 설정에서 변경하세요.</p></div>
+    <button class="btn btn-primary btn-block" onclick="doAdminLogin()">로그인</button>
+    <p id="gate-err" style="color:var(--tv-danger);font-size:13px;margin-top:12px;display:none"></p>
+  </div>
+</div>
+<div id="app" class="hidden">
+  <div class="sb-backdrop" id="sb-backdrop" onclick="toggleSb(false)"></div>
+  <aside class="sb" id="sb">
+    <div class="sb-brand"><div class="lg">TRE<b>VITY</b></div><span class="role">관리자 콘솔</span></div>
+    <nav class="sb-nav" id="sb-nav"></nav>
+    <div class="sb-foot"><a href="../index.html" target="_blank">사이트 </a><button onclick="Admin.logout();location.reload()">로그아웃</button></div>
+  </aside>
+  <div class="mainarea">
+    <div class="topbar2"><button class="burger" onclick="toggleSb(true)">☰</button>
+      <h1 id="pg-title">대시보드</h1><span class="sp"></span><span class="desc" id="pg-desc"></span></div>
+    <div class="content">
+      <section id="tab-dash"></section>
+      <section id="tab-inq" class="hidden"></section>
+      <section id="tab-blog" class="hidden"></section>
+      <section id="tab-copy" class="hidden"></section>
+      <section id="tab-settings" class="hidden"></section>
+    </div>
+  </div>
+</div>
+<script src="../assets/js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/store.js"></script>
+<script src="../assets/js/upload.js"></script>
+<script src="../assets/js/store-supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<script src="../assets/js/admin.js"></script>
+</body>
+</html>
