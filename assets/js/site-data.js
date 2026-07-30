@@ -72,23 +72,18 @@ function renderHeroWall(selector){
   wrap.innerHTML = items.map(slide).join('');
 }
 
-/* ---------- 패키지 카드 (vietnam-tiktok.html) ---------- */
-function renderPackages(containerSelector){
-  const el = document.querySelector(containerSelector);
-  if(!el) return;
-  const pkgs = TV_PACKAGES.slice().sort((a,b)=>a.sort_order-b.sort_order);
-  const cards = el.querySelectorAll('[data-pkg-slug]');
-  cards.forEach(card => {
-    const slug = card.getAttribute('data-pkg-slug');
-    const p = pkgs.find(x=>x.slug===slug);
-    if(!p) return;
-    const nameEl = card.querySelector('[data-pkg-name]');
-    const cntEl = card.querySelector('[data-pkg-count]');
-    const priceEl = card.querySelector('[data-pkg-price]');
-    const descEl = card.querySelector('[data-pkg-desc]');
-    if(nameEl) nameEl.textContent = p.name;
-    if(cntEl) cntEl.textContent = p.influencer_count + '명';
-    if(priceEl) priceEl.textContent = p.price_krw.toLocaleString('ko-KR') + '원';
-    if(descEl) descEl.textContent = p.description;
+/* ---------- 패키지 카드 (vietnam-tiktok.html) ----------
+   [data-pkg-label="slug"] 스팬 → "스타터 · 10명" 형식
+   [data-pkg-price="slug"] h6 → "10명 × 20만원 = 200만원 (부가세 별도)" 형식 */
+function renderPackages(){
+  if(!TV_PACKAGES.length) return;
+  TV_PACKAGES.forEach(p=>{
+    const label = `${p.name} · ${p.influencer_count}명`;
+    document.querySelectorAll(`[data-pkg-label="${p.slug}"]`).forEach(el=>{ el.textContent = label; });
+    const per = p.influencer_count ? Math.round(p.price_krw / p.influencer_count / 10000) : 0;
+    const tot = Math.round(p.price_krw / 10000).toLocaleString('ko-KR');
+    document.querySelectorAll(`[data-pkg-price="${p.slug}"]`).forEach(el=>{
+      el.innerHTML = `${p.influencer_count}명 × ${per}만원 = <span style="color:#fa6781;font-weight:800">${tot}만원</span> (부가세 별도)`;
+    });
   });
 }
