@@ -111,20 +111,43 @@ async function boot(){
 }
 
 /* ---------- 사이드바 · 탭 ---------- */
-const TABS = ['dash','inq','blog','copy','settings'];
+const TABS = ['dash','inq','blog','board','seo','copy','settings'];
 const NAV = [
   { id:'dash',     label:'대시보드', title:'대시보드',        desc:'문의·콘텐츠 현황 한눈에 보기' },
   { id:'inq',      label:'문의함',   title:'문의함',          desc:'inquiry.html로 들어온 문의' },
-  { id:'blog',     label:'블로그',   title:'블로그 관리',      desc:'글 작성·수정·발행' },
+  { id:'board',    label:'게시판',   title:'게시판 관리',      desc:'HTML 본문 → 정적 페이지 굽기' },
   { id:'copy',     label:'카피',     title:'포트폴리오 · 패키지', desc:'이미지 롤과 vietnam-tiktok 패키지 가격' },
+  { id:'seo',      label:'SEO',     title:'SEO 관리',        desc:'메타·구조화데이터·sitemap·플로팅버튼·메일' },
   { id:'settings', label:'설정',     title:'설정',            desc:'관리자 비밀번호와 연결 상태' },
 ];
 let curTab = 'dash';
 
+/* 편집 서버(:5723) 주소 — 관리자를 어느 포트로 열든 게시판/SEO는 편집 서버 API를 쓴다 */
+const EDIT_ORIGIN = 'http://localhost:5723';
+
 function renderNav(){
   const newCnt = ADM.inqs.filter(i=>i.status==='new').length;
-  const counts = { inq:newCnt||'', blog:TV_BLOG_POSTS.length, copy:'', dash:'', settings:'' };
-  document.getElementById('sb-nav').innerHTML = NAV.map(n=>navBtn(n,counts)).join('');
+  const counts = { inq:newCnt||'', board:TV_BLOG_POSTS.length, copy:'', dash:'', seo:'', settings:'' };
+  document.getElementById('sb-nav').innerHTML = NAV.map(n=>navBtn(n,counts)).join('')
+    + `<div class="grp">도구</div>`
+    + `<button onclick="window.open(EDIT_ORIGIN+'/','_blank')"><span>✏️ 화면 편집 (사이트 보면서 수정)</span></button>`;
+}
+
+/* ---------- 게시판 · SEO (편집 서버 UI 내장) ---------- */
+function renderBoard(){
+  const el = document.getElementById('tab-board');
+  if(el.dataset.loaded) return;
+  el.dataset.loaded = '1';
+  el.innerHTML = `<p class="tool-note">편집 서버가 켜져 있어야 합니다 (python edit-server.py · 자동으로 켜져 있으면 그대로 사용).
+    저장하면 blog-슬러그.html 정적 페이지로 구워집니다.</p>
+    <iframe class="tool-frame" src="${EDIT_ORIGIN}/board.html"></iframe>`;
+}
+function renderSeo(){
+  const el = document.getElementById('tab-seo');
+  if(el.dataset.loaded) return;
+  el.dataset.loaded = '1';
+  el.innerHTML = `<p class="tool-note">메타·sitemap·robots·rss·구조화데이터·플로팅 버튼·문의 메일 설정 — 저장 즉시 HTML에 구워집니다.</p>
+    <iframe class="tool-frame" src="${EDIT_ORIGIN}/seo.html"></iframe>`;
 }
 function navBtn(n, counts){
   const c = counts[n.id];
@@ -146,7 +169,7 @@ function toggleSb(open){
   document.getElementById('sb-backdrop').classList.toggle('open', !!open);
 }
 function renderAll(){
-  renderNav(); renderDash(); renderInq(); renderBlog(); renderCopy(); renderSettings();
+  renderNav(); renderDash(); renderInq(); renderBlog(); renderBoard(); renderSeo(); renderCopy(); renderSettings();
   showTab(curTab);
 }
 
