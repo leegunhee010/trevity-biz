@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard','Noto Sans KR','Malgun Gothic',sans-serif;letter-spacing:-0.02em}
+.frame{width:700px;height:330px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.f1{background:linear-gradient(135deg,#fff1f4,#fef7f8 55%,#fff)}
+.f2{background:linear-gradient(135deg,#fef4f6,#fff 60%,#fff0f3)}
+.f3{background:linear-gradient(135deg,#f6f7fb,#fff 55%,#feeff3)}
+.f4{background:linear-gradient(135deg,#fff0f3,#fff 50%,#f6f7fb)}
+.f5{background:linear-gradient(135deg,#fef2f5,#fff6f2 60%,#fff)}
+.win{background:#fff;border-radius:18px;box-shadow:0 14px 44px rgba(31,31,35,.13);width:560px;overflow:hidden}
+.bar{display:flex;align-items:center;gap:8px;padding:14px 20px;border-bottom:1px solid #f1f1f4}
+.bar .dots{display:flex;gap:5px}
+.bar .dots i{width:9px;height:9px;border-radius:50%;background:#e7e7ec;display:block}
+.bar .tt{font-size:19px;font-weight:800;color:#26262b;margin-left:6px}
+.bar .bd{margin-left:auto;font-size:14px;font-weight:700;color:#fa6781;background:#fff0f3;border-radius:99px;padding:5px 13px}
+.pad{padding:16px 22px}
+/* f1: search no result */
+.sbox{display:flex;align-items:center;gap:10px;background:#f4f4f6;border-radius:12px;padding:12px 16px;font-size:17px;color:#3c3c43;font-weight:600}
+.sbox .ic{color:#9a9aa2}
+.nores{text-align:center;padding:22px 0 10px}
+.nores .big{font-size:21px;font-weight:800;color:#26262b}
+.nores .small{font-size:15px;color:#8b8b92;margin-top:6px}
+/* f2: post low reaction */
+.post{display:flex;gap:14px;align-items:center;padding:6px 0 14px;border-bottom:1px solid #f4f4f6}
+.pimg{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#ffd9e1,#fdb0c0);display:flex;align-items:center;justify-content:center;font-size:28px}
+.ptxt .a{font-size:16.5px;font-weight:700;color:#26262b}
+.ptxt .b{font-size:14px;color:#8b8b92;margin-top:3px}
+.react{display:flex;gap:22px;padding-top:14px}
+.react .r{text-align:center}
+.react .n{font-size:24px;font-weight:900;color:#26262b}
+.react .n.bad{color:#fa6781}
+.react .l{font-size:13.5px;color:#8b8b92;margin-top:2px;font-weight:600}
+/* f3: review gap */
+.rv{display:flex;gap:12px;padding-top:4px}
+.rcard{flex:1;background:#f8f8fa;border-radius:14px;padding:16px;text-align:center}
+.rcard .plat{font-size:14.5px;font-weight:700;color:#6d6d75}
+.rcard .score{font-size:30px;font-weight:900;color:#26262b;margin-top:6px}
+.rcard .score.bad{color:#fa6781}
+.rcard .cnt{font-size:13.5px;color:#8b8b92;margin-top:4px;font-weight:600}
+/* f4: no contact */
+.dm{display:flex;align-items:center;gap:13px;padding:11px 0;border-bottom:1px solid #f4f4f6}
+.dm:last-child{border-bottom:none}
+.av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#fff}
+.dm .nm{font-size:17px;font-weight:800;color:#26262b}
+.dm .msg{font-size:14.5px;color:#8b8b92;margin-top:2px}
+.dm .badge{margin-left:auto;font-size:13px;font-weight:700;border-radius:8px;padding:5px 10px;color:#9a9aa2;background:#f4f4f6}
+/* f5: channel maze */
+.maze{display:flex;gap:12px;padding-top:4px}
+.ch{flex:1;background:#f8f8fa;border-radius:14px;padding:18px 10px;text-align:center}
+.ch .em{font-size:30px}
+.ch .nm2{font-size:15px;font-weight:700;color:#6d6d75;margin-top:8px}
+.ch .q{font-size:22px;font-weight:900;color:#fa6781;margin-top:6px}
+</style></head><body>
+
+<div class="frame f1" id="tp1"><div class="win">
+  <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="tt">더우인 검색 · 중국</span><span class="bd">예시 화면</span></div>
+  <div class="pad">
+    <div class="sbox"><span class="ic">🔍</span> 附近美食 (근처 맛집)</div>
+    <div class="nores"><div class="big">우리 매장 결과 없음</div><div class="small">로컬 손님이 검색해도 우리 매장은 나오지 않습니다</div></div>
+  </div>
+</div></div>
+
+<div class="frame f2" id="tp2"><div class="win">
+  <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="tt">내 계정 · 중국어 게시물</span><span class="bd">예시 화면</span></div>
+  <div class="pad">
+    <div class="post"><div class="pimg">🍜</div><div class="ptxt"><div class="a">新店开业优惠… (번역기 문장)</div><div class="b">3주 전 업로드 · 중국어 해시태그 12개</div></div></div>
+    <div class="react">
+      <div class="r"><div class="n bad">2</div><div class="l">좋아요</div></div>
+      <div class="r"><div class="n bad">0</div><div class="l">댓글</div></div>
+      <div class="r"><div class="n bad">0</div><div class="l">공유</div></div>
+      <div class="r" style="margin-left:auto;text-align:right"><div class="n" style="font-size:16px;color:#8b8b92;font-weight:700;padding-top:8px">현지인에게 닿지 않음</div></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="frame f3" id="tp3"><div class="win">
+  <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="tt">우리 매장 리뷰 현황</span><span class="bd">예시 화면</span></div>
+  <div class="pad"><div class="rv">
+    <div class="rcard"><div class="plat">따중디엔핑</div><div class="score">4.8</div><div class="cnt">리뷰 1,240개</div></div>
+    <div class="rcard"><div class="plat">샤오홍슈</div><div class="score bad">0</div><div class="cnt">언급 없음</div></div>
+    <div class="rcard"><div class="plat">더우인</div><div class="score bad">0</div><div class="cnt">언급 없음</div></div>
+  </div></div>
+</div></div>
+
+<div class="frame f4" id="tp4"><div class="win">
+  <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="tt">체험단 모집 시도</span><span class="bd">예시 화면</span></div>
+  <div class="pad" style="padding-top:6px;padding-bottom:8px">
+    <div class="dm"><span class="av" style="background:linear-gradient(135deg,#b9c0ff,#8f9bff)">V</span><div><div class="nm">현지 교민 커뮤니티</div><div class="msg">홍보 방법 물어봐도 뾰족한 답이…</div></div><span class="badge">지원 0명</span></div>
+    <div class="dm"><span class="av" style="background:linear-gradient(135deg,#ffd08a,#ffb45e)">G</span><div><div class="nm">현지 마케팅 대행 검색</div><div class="msg">어느 업체가 믿을만한지 알 수 없음</div></div><span class="badge">검증 불가</span></div>
+    <div class="dm"><span class="av" style="background:linear-gradient(135deg,#9be2c3,#5ecb9e)">?</span><div><div class="nm">직접 DM</div><div class="msg">你好… (중국어로 뭐라고 하지?)</div></div><span class="badge">전송 실패</span></div>
+  </div>
+</div></div>
+
+<div class="frame f5" id="tp5"><div class="win">
+  <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="tt">어디에 알려야 할까?</span><span class="bd">예시 화면</span></div>
+  <div class="pad"><div class="maze">
+    <div class="ch"><div class="em">📕</div><div class="nm2">샤오홍슈</div><div class="q">?</div></div>
+    <div class="ch"><div class="em">🎵</div><div class="nm2">더우인</div><div class="q">?</div></div>
+    <div class="ch"><div class="em">⭐</div><div class="nm2">디엔핑</div><div class="q">?</div></div>
+    <div class="ch"><div class="em">💬</div><div class="nm2">위챗</div><div class="q">?</div></div>
+  </div></div>
+</div></div>
+
+</body></html>

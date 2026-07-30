@@ -173,10 +173,16 @@ def localbusiness_ld(domain):
     }
 
 
-# ---------- FAQ 자동 추출 (Q. 아코디언) ----------
+# ---------- FAQ 자동 추출 (Q. 아코디언 + details/summary) ----------
 def extract_faq(s):
-    """트래비티 아코디언: <h5 ...>Q. 질문</h5> ... <span ...>답변</span> 쌍 추출."""
+    """① <details><summary>Q...</summary>답</details>  ② <h5>Q. 질문</h5>+<span>답변</span> 쌍."""
     out = []
+    for m in re.finditer(r"<details[^>]*>\s*<summary[^>]*>(.*?)</summary>(.*?)</details>", s, re.S):
+        q = re.sub(r"<[^>]+>", " ", m.group(1)).strip()
+        q = re.sub(r"^\s*Q\.\s*", "", re.sub(r"\s+", " ", q))
+        a = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", m.group(2))).strip()
+        if q and a:
+            out.append((q, a))
     for m in re.finditer(r"<h5[^>]*>\s*Q\.\s*(.*?)</h5>(.*?)(?=<h5[^>]*>\s*Q\.|</section>|$)", s, re.S):
         q = re.sub(r"<[^>]+>", "", m.group(1)).strip()
         am = re.search(r'<span[^>]*text-\[16px\][^>]*>(.*?)</span>', m.group(2), re.S)
@@ -438,8 +444,8 @@ def bake_post(post):
     links, styles, header, footer = _blog_chrome()
     slug = post["slug"]
     url = f"{domain}/blog-{slug}.html"
-    title = post.get("title", "")
-    desc = re.sub(r"<[^>]+>", " ", post.get("excerpt", "")).strip()
+    title = post.get("title", "").replace('"', "&quot;")
+    desc = re.sub(r"<[^>]+>", " ", post.get("excerpt", "")).strip().replace('"', "&quot;")
     thumb = post.get("thumbnail_url", "")
     date = str(post.get("created_at", ""))[:10]
     ld = {"@context": "https://schema.org", "@type": "Article",
@@ -472,17 +478,19 @@ def bake_post(post):
 <link rel="canonical" href="{url}">
 <script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>
 <script type="application/ld+json">{json.dumps(crumb, ensure_ascii=False)}</script>
+<script type="application/ld+json">{json.dumps(organization_ld(domain), ensure_ascii=False)}</script>
+<script type="application/ld+json">{json.dumps(localbusiness_ld(domain), ensure_ascii=False)}</script>
 {links}
 {styles}
 </head>
 <body class="max-[767px]:min-w-[360px] min-[767px]:min-w-[1440px]">
 {header}
-<div class="tv-bloghero"><h1>{post.get("category", "블로그")}</h1></div>
+<div class="tv-bloghero"><p style="font-size:40px;font-weight:800;letter-spacing:-0.8px;color:#1f1f1f;margin:0">{post.get("category", "블로그")}</p></div>
 <div style="max-width:760px;margin:0 auto;padding:40px 20px 100px;word-break:keep-all">
   <article>
     <h1 style="font-size:28px;font-weight:800;margin-bottom:10px;line-height:1.4">{title}</h1>
     <p style="color:#8B95A1;font-size:13px;margin-bottom:28px">{date} · {post.get("read_minutes", 4)}분 분량</p>
-    {f'<img src="{thumb}" alt="" style="width:100%;border-radius:12px;margin-bottom:28px">' if thumb else ''}
+    {f'<img src="{thumb}" alt="{title}" style="width:100%;border-radius:12px;margin-bottom:28px">' if thumb else ''}
     <div style="line-height:1.85;font-size:16px">{post.get("body_html", "")}</div>
     <p style="margin-top:40px"><a href="./blog.html" style="color:#fa6781;font-weight:700;text-decoration:none">← 블로그 목록으로</a></p>
   </article>

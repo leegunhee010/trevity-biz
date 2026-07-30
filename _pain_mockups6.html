@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard','Noto Sans KR','Malgun Gothic',sans-serif;letter-spacing:-0.02em}
+.frame{width:700px;height:330px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.f1{background:linear-gradient(135deg,#fff1f4,#fef7f8 55%,#fff)}
+.f2{background:linear-gradient(135deg,#fef4f6,#fff 60%,#fff0f3)}
+.f3{background:linear-gradient(135deg,#f6f7fb,#fff 55%,#feeff3)}
+.f4{background:linear-gradient(135deg,#fff0f3,#fff 50%,#f6f7fb)}
+.f5{background:linear-gradient(135deg,#fef2f5,#fff6f2 60%,#fff)}
+.win{background:#fff;border-radius:18px;box-shadow:0 14px 44px rgba(31,31,35,.13);width:560px;overflow:hidden}
+.bar{display:flex;align-items:center;gap:8px;padding:14px 20px;border-bottom:1px solid #f1f1f4}
+.bar .dots{display:flex;gap:5px}
+.bar .dots i{width:9px;height:9px;border-radius:50%;background:#e7e7ec;display:block}
+.bar .tt{font-size:19px;font-weight:800;color:#26262b;margin-left:6px}
+.bar .bd{margin-left:auto;font-size:14px;font-weight:700;color:#fa6781;background:#fff0f3;border-radius:99px;padding:5px 13px}
+.pad{padding:16px 22px}
+/* s1 search competitors */
+.sbox{display:flex;align-items:center;gap:10px;background:#f4f4f6;border-radius:12px;padding:12px 16px;font-size:17px;color:#3c3c43;font-weight:600}
+.res{background:#f8f8fa;border-radius:12px;padding:12px 16px;margin-top:10px}
+.res .a{font-size:15.5px;font-weight:800;color:#26262b}
+.res .b{font-size:12.5px;color:#8b8b92;margin-top:3px}
+/* s2 ad spend */
+.stats{display:flex;gap:12px;padding:4px 0 12px}
+.st{flex:1;background:#f8f8fa;border-radius:12px;padding:14px;text-align:center}
+.st .n{font-size:25px;font-weight:900;color:#26262b}
+.st .n.bad{color:#fa6781}
+.st .l{font-size:13.5px;color:#8b8b92;margin-top:3px;font-weight:600}
+.warn{font-size:14px;color:#8b8b92;text-align:center;font-weight:600;background:#fff6f8;border-radius:10px;padding:10px}
+.warn b{color:#fa6781}
+/* s3 calendar */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;padding-top:4px}
+.day{height:52px;border-radius:10px;background:#f4f4f6;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;color:#9a9aa2;font-weight:700}
+.day span{font-size:14px;color:#6d6d75}
+.day.emp{background:#fff2f5;color:#fa6781}
+.day.bk{background:#e9f9f1;color:#12b76a}
+/* s4 dm */
+.dm{display:flex;align-items:center;gap:13px;padding:11px 0;border-bottom:1px solid #f4f4f6}
+.dm:last-child{border-bottom:none}
+.av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#fff}
+.dm .nm{font-size:17px;font-weight:800;color:#26262b}
+.dm .msg{font-size:14.5px;color:#8b8b92;margin-top:2px}
+.dm .badge{margin-left:auto;font-size:13px;font-weight:700;border-radius:8px;padding:5px 10px;color:#fa6781;background:#fff0f3;white-space:nowrap}
+.dm .badge.g{color:#9a9aa2;background:#f4f4f6}
+/* s5 channels */
+.maze{display:flex;gap:12px;padding-top:4px}
+.ch{flex:1;background:#f8f8fa;border-radius:14px;padding:18px 10px;text-align:center}
+.ch .em{font-size:30px}
+.ch .nm2{font-size:15px;font-weight:700;color:#6d6d75;margin-top:8px}
+.ch .q{font-size:22px;font-weight:900;color:#fa6781;margin-top:6px}
+</style></head><body>
+
+<div class="frame f1" id="st1"><div class="win">
+  <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="tt">네이버 검색</span><span class="bd">예시 화면</span></div>
+  <div class="pad">
+    <div class="sbox">🔍 가평 풀빌라 후기</div>
+    <div class="res"><div class="a">◯◯풀빌라 1박 2일 솔직 후기 (경쟁 숙소)</div><div class="b">블로그 · 어제</div></div>
+    <div class="res"><div class="a">△△펜션 다녀왔어요~ 수영장 최고 (경쟁 숙소)</div><div class="b">블로그 · 2일 전</div></div>
+  </div>
+</div></div>
+
+<div class="frame f2" id="st2"><div class="win">
+  <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="tt">이번 달 광고 성과</span><span class="bd">예시 화면</span></div>
+  <div class="pad">
+    <div class="stats">
+      <div class="st"><div class="n bad">87만원</div><div class="l">이번 달 광고비</div></div>
+      <div class="st"><div class="n">클릭 412</div><div class="l">유입</div></div>
+      <div class="st"><div class="n bad">3건</div><div class="l">예약 전환</div></div>
+    </div>
+    <div class="warn">광고를 끄는 순간, <b>노출도 0</b>이 됩니다</div>
+  </div>
+</div></div>
+
+<div class="frame f3" id="st3"><div class="win">
+  <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="tt">이번 주 예약 현황</span><span class="bd">예시 화면</span></div>
+  <div class="pad"><div class="cal">
+    <div class="day"><span>월</span>공실</div><div class="day emp"><span>화</span>공실</div><div class="day emp"><span>수</span>공실</div><div class="day emp"><span>목</span>공실</div><div class="day"><span>금</span>공실</div><div class="day bk"><span>토</span>예약</div><div class="day bk"><span>일</span>예약</div>
+  </div><p style="margin:14px 0 2px;font-size:14px;color:#8b8b92;text-align:center;font-weight:600">주중 공실은 그대로 <b style="color:#fa6781">고정비 손실</b>입니다</p></div>
+</div></div>
+
+<div class="frame f4" id="st4"><div class="win">
+  <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="tt">블로거 직접 섭외 시도</span><span class="bd">예시 화면</span></div>
+  <div class="pad" style="padding-top:6px;padding-bottom:8px">
+    <div class="dm"><span class="av" style="background:linear-gradient(135deg,#b9c0ff,#8f9bff)">T</span><div><div class="nm">여행블로거 A</div><div class="msg">숙박 제공 외에 원고료 15만원입니다</div></div><span class="badge">원고료 요구</span></div>
+    <div class="dm"><span class="av" style="background:linear-gradient(135deg,#ffd08a,#ffb45e)">P</span><div><div class="nm">여행블로거 B</div><div class="msg">협찬비는 별도로 받고 있어요^^</div></div><span class="badge">협찬비 별도</span></div>
+    <div class="dm"><span class="av" style="background:linear-gradient(135deg,#9be2c3,#5ecb9e)">M</span><div><div class="nm">여행블로거 C</div><div class="msg">문의드립니다…</div></div><span class="badge g">답장 없음</span></div>
+  </div>
+</div></div>
+
+<div class="frame f5" id="st5"><div class="win">
+  <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="tt">어디에 알려야 할까?</span><span class="bd">예시 화면</span></div>
+  <div class="pad"><div class="maze">
+    <div class="ch"><div class="em">🟢</div><div class="nm2">네이버</div><div class="q">?</div></div>
+    <div class="ch"><div class="em">📸</div><div class="nm2">인스타그램</div><div class="q">?</div></div>
+    <div class="ch"><div class="em">🗺️</div><div class="nm2">구글맵</div><div class="q">?</div></div>
+    <div class="ch"><div class="em">🏠</div><div class="nm2">예약 플랫폼</div><div class="q">?</div></div>
+  </div></div>
+</div></div>
+
+</body></html>

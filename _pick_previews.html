@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard','Noto Sans KR','Malgun Gothic',sans-serif;word-break:keep-all}
+.sec{padding:90px 20px;background:#fff}
+.in{max-width:1084px;margin:0 auto;text-align:center}
+.label{display:inline-block;font-size:14px;font-weight:800;letter-spacing:2.5px;color:#fa6781;margin-bottom:16px}
+h2{font-size:34px;font-weight:800;letter-spacing:-0.68px;color:#1f1f1f;line-height:1.45}
+.sub{font-size:16px;color:#595959;margin-top:16px}
+/* ===== A안: 탭 셀렉터 ===== */
+.tabs{display:flex;gap:10px;justify-content:center;margin-top:44px;flex-wrap:wrap}
+.tab{font-size:15.5px;font-weight:700;letter-spacing:-0.31px;color:#595959;background:#f4f4f6;border:none;border-radius:99px;padding:13px 24px;cursor:pointer;transition:all .2s}
+.tab.on{background:#fa6781;color:#fff;box-shadow:0 8px 22px rgba(250,103,129,.35)}
+.panel{display:none;margin-top:40px;background:linear-gradient(160deg,#fff5f7,#fff);border:1.5px solid #ffe3ea;border-radius:24px;padding:52px 56px;text-align:left}
+.panel.on{display:flex;gap:48px;align-items:center}
+.panel .t{flex:1.1}
+.panel .sit{font-size:15px;font-weight:700;color:#8c8c8c}
+.panel h3{font-size:30px;font-weight:800;color:#1f1f1f;letter-spacing:-0.6px;line-height:1.4;margin-top:10px}
+.panel p{font-size:16px;color:#595959;line-height:1.75;margin-top:14px}
+.panel p b{color:#fa6781}
+.panel .go{display:inline-block;margin-top:26px;background:#fa6781;color:#fff;font-size:15.5px;font-weight:700;border-radius:10px;padding:14px 30px;text-decoration:none}
+.panel .v{flex:1;border-radius:18px;overflow:hidden;box-shadow:0 16px 48px rgba(31,31,35,.14);height:300px}
+.panel .v img{width:100%;height:100%;object-fit:cover;display:block}
+/* ===== B안: 풀폭 밴드 ===== */
+.rows{margin-top:44px;border-top:1px solid #eee}
+.row{display:flex;align-items:center;gap:32px;padding:34px 28px;border-bottom:1px solid #eee;text-decoration:none;position:relative;overflow:hidden;transition:all .25s}
+.row::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#fff0f3,#ffe3ea);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.row:hover::before{transform:scaleX(1)}
+.row>*{position:relative}
+.row .sit{width:300px;text-align:left;font-size:15px;font-weight:700;color:#8c8c8c;flex:none}
+.row .name{flex:1;text-align:left}
+.row .name b{display:block;font-size:23px;font-weight:800;color:#1f1f1f;letter-spacing:-0.46px}
+.row .name small{display:block;font-size:14.5px;color:#767680;margin-top:6px}
+.row .name small i{font-style:normal;color:#fa6781;font-weight:700}
+.row .th{width:150px;height:96px;border-radius:12px;object-fit:cover;flex:none;box-shadow:0 8px 22px rgba(31,31,35,.14)}
+.row .ar{font-size:26px;color:#d9d9de;font-weight:700;transition:all .25s;flex:none}
+.row:hover .ar{color:#fa6781;transform:translateX(6px)}
+.divider{background:#1f2023;color:#fff;text-align:center;padding:22px;font-size:18px;font-weight:800;letter-spacing:2px}
+</style></head><body>
+
+<div class="divider">A안 — 상황 셀렉터 탭</div>
+<section class="sec"><div class="in">
+<span class="label">TREVITY SERVICE</span>
+<h2>어떤 사장님이신가요?</h2>
+<p class="sub">상황만 고르세요. 맞는 서비스로 바로 안내해 드립니다.</p>
+<div class="tabs">
+<button class="tab on" data-p="p1">제품을 수출해요</button>
+<button class="tab" data-p="p2">한국에서 매장해요</button>
+<button class="tab" data-p="p3">베트남에서 매장해요</button>
+<button class="tab" data-p="p4">숙박업을 해요</button>
+</div>
+<div class="panel on" id="p1"><div class="t"><p class="sit">"베트남 · 중국에 제품을 팔고 싶어요"</p><h3>한국제품 해외수출 마케팅</h3><p>팔로워 10만~50만 현지 인플루언서가 직접 올립니다.<br><b>1명당 20만원 균일가</b>, 한 번에 최대 50명까지. 틱톡샵 제휴 판매 설계까지 함께 갑니다.</p><a class="go">자세히 보기 →</a></div><div class="v"><img src="./images/landing/home/hero/10.png"/></div></div>
+<div class="panel" id="p2"><div class="t"><p class="sit">"한국에서 매장을 운영해요"</p><h3>외국인 관광객 마케팅</h3><p>한국에 와 있는 베트남인·중국인 인플루언서가 매장을 체험하고 모국 SNS에 알립니다.<br><b>여행 준비자가 검색하면 우리 매장이 나오게.</b></p><a class="go">자세히 보기 →</a></div><div class="v"><img src="./images/landing/home/hero/4.png"/></div></div>
+<div class="panel" id="p3"><div class="t"><p class="sit">"베트남에서 매장을 운영해요"</p><h3>베트남 현지 매장 마케팅</h3><p>로컬, 중국인 관광객, 한국인 관광객 — <b>세 방향의 손님</b>을 데려옵니다. 호치민 현지팀이 직접 움직입니다.</p><a class="go">자세히 보기 →</a></div><div class="v"><img src="./images/landing/home/hero/9.png"/></div></div>
+<div class="panel" id="p4"><div class="t"><p class="sit">"호텔 · 펜션을 운영해요"</p><h3>숙박 체험단</h3><p>비어 있는 객실 하루만 내어주세요. 광고비도 대행비도 <b>0원</b>, 후기는 검색에 평생 남습니다.</p><a class="go">자세히 보기 →</a></div><div class="v"><img src="./images/landing/home/hero/6.png"/></div></div>
+</div></section>
+
+<div class="divider">B안 — 풀폭 가로 밴드</div>
+<section class="sec"><div class="in">
+<span class="label">TREVITY SERVICE</span>
+<h2>어떤 사장님이신가요?</h2>
+<p class="sub">상황만 고르세요. 맞는 서비스로 바로 안내해 드립니다.</p>
+<div class="rows">
+<a class="row"><span class="sit">"베트남 · 중국에 제품을 팔고 싶어요"</span><span class="name"><b>한국제품 해외수출 마케팅</b><small>현지 인플루언서 <i>1명당 20만원 균일가</i> · 최대 50명</small></span><img class="th" src="./images/landing/home/hero/10.png"/><span class="ar">→</span></a>
+<a class="row"><span class="sit">"한국에서 매장을 운영해요"</span><span class="name"><b>외국인 관광객 마케팅</b><small>방한 베트남인·중국인 체험단 · <i>모국 SNS 노출</i></small></span><img class="th" src="./images/landing/home/hero/4.png"/><span class="ar">→</span></a>
+<a class="row"><span class="sit">"베트남에서 매장을 운영해요"</span><span class="name"><b>베트남 현지 매장 마케팅</b><small>로컬 · 중국인 · 한국인, <i>세 방향의 손님</i></small></span><img class="th" src="./images/landing/home/hero/9.png"/><span class="ar">→</span></a>
+<a class="row"><span class="sit">"호텔 · 펜션을 운영해요"</span><span class="name"><b>숙박 체험단</b><small>사장님은 <i>0원</i> · 객실 하루면 됩니다</small></span><img class="th" src="./images/landing/home/hero/6.png"/><span class="ar">→</span></a>
+</div>
+</div></section>
+
+<script>
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');document.getElementById(t.dataset.p).classList.add('on');
+}));
+</script>
+</body></html>

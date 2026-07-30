@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard','Noto Sans KR','Malgun Gothic',sans-serif;letter-spacing:-0.02em}
+.frame{width:700px;height:330px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.f1{background:linear-gradient(135deg,#fff1f4,#fef7f8 55%,#fff)}
+.f2{background:linear-gradient(135deg,#fef4f6,#fff 60%,#fff0f3)}
+.f3{background:linear-gradient(135deg,#f6f7fb,#fff 55%,#feeff3)}
+.f4{background:linear-gradient(135deg,#fff0f3,#fff 50%,#f6f7fb)}
+.f5{background:linear-gradient(135deg,#fef2f5,#fff6f2 60%,#fff)}
+.win{background:#fff;border-radius:18px;box-shadow:0 14px 44px rgba(31,31,35,.13);width:560px;overflow:hidden}
+.bar{display:flex;align-items:center;gap:8px;padding:14px 20px;border-bottom:1px solid #f1f1f4}
+.bar .dots{display:flex;gap:5px}
+.bar .dots i{width:9px;height:9px;border-radius:50%;background:#e7e7ec;display:block}
+.bar .tt{font-size:19px;font-weight:800;color:#26262b;margin-left:6px}
+.bar .bd{margin-left:auto;font-size:14px;font-weight:700;color:#fa6781;background:#fff0f3;border-radius:99px;padding:5px 13px}
+.pad{padding:16px 22px}
+/* pp1 */
+.prod{display:flex;align-items:center;gap:14px;padding:8px 0 14px;border-bottom:1px solid #f4f4f6}
+.thumb{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#ffd9e1,#fdb0c0);display:flex;align-items:center;justify-content:center;font-size:24px}
+.pname{font-size:19px;font-weight:800;color:#26262b}
+.psub{font-size:14.5px;color:#8b8b92;margin-top:3px}
+.live{margin-left:auto;font-size:14px;font-weight:700;color:#12b76a;background:#e9f9f1;border-radius:8px;padding:6px 12px}
+.zeroline{display:flex;align-items:center;gap:16px;padding-top:14px}
+.zl-label{font-size:16px;color:#6d6d75;font-weight:600}
+.zl-num{font-size:44px;font-weight:900;color:#fa6781;line-height:1}
+.zl-unit{font-size:20px;font-weight:800;color:#fa6781}
+.ghost{flex:1;margin-left:12px}
+.ghost i{display:block;height:13px;border-radius:99px;border:1.5px dashed #ffd3dc;margin:7px 0}
+/* pp2 */
+.comm{display:flex;gap:12px;align-items:center;padding:6px 0 16px;border-bottom:1px solid #f4f4f6}
+.chip{font-size:18px;font-weight:800;border-radius:10px;padding:9px 16px;background:#f4f4f6;color:#a5a5ad;text-decoration:line-through}
+.chip.hot{background:#fa6781;color:#fff;text-decoration:none;box-shadow:0 6px 16px rgba(250,103,129,.35)}
+.arrow{font-size:20px;color:#c9c9cf;font-weight:800}
+.cart{display:flex;align-items:center;gap:14px;padding-top:16px}
+.cart .ic{width:46px;height:46px;border-radius:12px;background:#f6f6f8;display:flex;align-items:center;justify-content:center;font-size:22px}
+.cart .t1{font-size:16px;color:#6d6d75;font-weight:600}
+.cart .t2{font-size:26px;font-weight:900;color:#26262b;margin-top:2px}
+.cart .t2 b{color:#fa6781}
+/* pp3 */
+.stats{display:flex;gap:12px;padding:4px 0 14px}
+.st{flex:1;background:#f8f8fa;border-radius:12px;padding:12px 14px;text-align:center}
+.st .n{font-size:26px;font-weight:900;color:#26262b}
+.st .n.bad{color:#fa6781}
+.st .l{font-size:13.5px;color:#8b8b92;margin-top:3px;font-weight:600}
+.vids{display:flex;gap:10px}
+.vid{flex:1;border-radius:10px;background:linear-gradient(160deg,#eceef2,#dfe2e8);height:64px;position:relative}
+.vid span{position:absolute;left:8px;bottom:6px;font-size:13px;font-weight:700;color:#70707a;background:#ffffffd9;border-radius:6px;padding:2px 7px}
+/* pp4 */
+.dm{display:flex;align-items:center;gap:13px;padding:11px 0;border-bottom:1px solid #f4f4f6}
+.dm:last-child{border-bottom:none}
+.av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#fff}
+.dm .nm{font-size:17px;font-weight:800;color:#26262b}
+.dm .msg{font-size:14.5px;color:#8b8b92;margin-top:2px}
+.dm .st8{margin-left:auto;text-align:right}
+.dm .time{font-size:13px;color:#b3b3ba}
+.dm .badge{font-size:13px;font-weight:700;border-radius:8px;padding:5px 10px;margin-top:4px;display:inline-block}
+.b-gray{color:#9a9aa2;background:#f4f4f6}
+.b-pink{color:#fa6781;background:#fff0f3}
+/* pp5 */
+.quo{display:flex;flex-direction:column;gap:10px;padding-top:2px}
+.bub{max-width:78%;border-radius:14px;padding:11px 16px;font-size:16.5px;font-weight:600;line-height:1.45}
+.me{align-self:flex-end;background:#fa6781;color:#fff;border-bottom-right-radius:4px}
+.them{align-self:flex-start;background:#f4f4f6;color:#3c3c43;border-bottom-left-radius:4px}
+.them b{color:#fa6781}
+</style></head><body>
+
+<div class="frame f1" id="pp1"><div class="win">
+  <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="tt">틱톡샵 · 어필리에이트 센터</span><span class="bd">예시 화면</span></div>
+  <div class="pad">
+    <div class="prod"><div class="thumb">🧴</div><div><div class="pname">K-뷰티 비타민 세럼 50ml</div><div class="psub">커미션 25% · 오픈 34일째</div></div><span class="live">판매중</span></div>
+    <div class="zeroline"><span class="zl-label">신청한<br>크리에이터</span><span class="zl-num">0</span><span class="zl-unit">명</span><span class="ghost"><i style="width:96%"></i><i style="width:78%"></i><i style="width:88%"></i></span></div>
+  </div>
+</div></div>
+
+<div class="frame f2" id="pp2"><div class="win">
+  <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="tt">커미션 설정</span><span class="bd">예시 화면</span></div>
+  <div class="pad">
+    <div class="comm"><span class="chip">15%</span><span class="arrow">→</span><span class="chip">20%</span><span class="arrow">→</span><span class="chip hot">25%</span><span style="margin-left:auto;font-size:14.5px;color:#8b8b92;font-weight:600">계속 올려봐도…</span></div>
+    <div class="cart"><span class="ic">🛒</span><div><div class="t1">내 상품을 담아 간 크리에이터</div><div class="t2">여전히 <b>0명</b>입니다</div></div></div>
+  </div>
+</div></div>
+
+<div class="frame f3" id="pp3"><div class="win">
+  <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="tt">시딩 결과 · 크리에이터 100명</span><span class="bd">예시 화면</span></div>
+  <div class="pad">
+    <div class="stats">
+      <div class="st"><div class="n">100개</div><div class="l">제품 발송</div></div>
+      <div class="st"><div class="n">2.4만</div><div class="l">총 조회수</div></div>
+      <div class="st"><div class="n bad">0</div><div class="l">상품 페이지 유입</div></div>
+    </div>
+    <div class="vids"><div class="vid"><span>조회 312</span></div><div class="vid"><span>조회 287</span></div><div class="vid"><span>조회 196</span></div><div class="vid"><span>조회 145</span></div></div>
+  </div>
+</div></div>
+
+<div class="frame f4" id="pp4"><div class="win">
+  <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="tt">보낸 메시지</span><span class="bd">예시 화면</span></div>
+  <div class="pad" style="padding-top:6px;padding-bottom:8px">
+    <div class="dm"><span class="av" style="background:linear-gradient(135deg,#b9c0ff,#8f9bff)">N</span><div><div class="nm">@ngoc.beauty</div><div class="msg">안녕하세요, 협업 제안드립니다…</div></div><div class="st8"><div class="time">6일 전</div><span class="badge b-gray">안 읽음</span></div></div>
+    <div class="dm"><span class="av" style="background:linear-gradient(135deg,#ffd08a,#ffb45e)">T</span><div><div class="nm">@thao.review</div><div class="msg">제품 소개서 보내드렸습니다</div></div><div class="st8"><div class="time">4일 전</div><span class="badge b-pink">읽음 · 답장 없음</span></div></div>
+    <div class="dm"><span class="av" style="background:linear-gradient(135deg,#9be2c3,#5ecb9e)">H</span><div><div class="nm">@hana.style</div><div class="msg">Xin chào! 협업 가능하실까요?</div></div><div class="st8"><div class="time">2일 전</div><span class="badge b-gray">안 읽음</span></div></div>
+  </div>
+</div></div>
+
+<div class="frame f5" id="pp5"><div class="win">
+  <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="tt">견적 문의</span><span class="bd">예시 화면</span></div>
+  <div class="pad"><div class="quo">
+    <div class="bub me">팔로워 30만이신데 광고 단가가 어떻게 되나요?</div>
+    <div class="bub them">외국 브랜드는 <b>1,500만동</b>부터 시작합니다</div>
+    <div class="bub them">다른 곳에선 <b>800만동</b>이라던데… 저흰 더 받아요 🙂</div>
+  </div></div>
+</div></div>
+
+</body></html>
