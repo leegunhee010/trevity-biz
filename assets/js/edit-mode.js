@@ -36,6 +36,7 @@
   #tvedit-msg{background:#fff;border-radius:8px;padding:9px 14px;font-size:13px;color:#191F28;
     box-shadow:0 4px 14px rgba(0,0,0,.14);display:none;max-width:340px}
   .tvedit-hl{outline:2px dashed #fa6781 !important;outline-offset:2px;cursor:text !important}
+  body.tvedit-on img:hover{outline:2px dashed #4a9eff;outline-offset:2px;cursor:pointer}
   .tvedit-live{outline:2px solid #fa6781 !important;outline-offset:2px;background:#fff5f7}
   `;
   document.head.appendChild(css);
@@ -56,8 +57,42 @@
     on = v;
     btn.textContent = on ? '✅ 편집 끄기' : '✏️ 편집 켜기';
     btn.classList.toggle('on', on);
-    if(on) say('고칠 문구를 클릭하세요. 수정 후 바깥을 클릭하면 파일에 저장됩니다.', 5200);
+    document.body.classList.toggle('tvedit-on', on);
+    if(on) say('문구를 클릭해 수정, 이미지를 클릭해 교체하세요. 저장은 파일에 바로 반영됩니다.', 5200);
     else { if(editing) finish(false); clearHl(); }
+  }
+
+  /* ---------- 이미지 교체 ---------- */
+  function isImgTarget(el){
+    return el && el.tagName === 'IMG' && el.getAttribute('src') &&
+           !el.closest('#tvedit-bar') && el.getAttribute('src').indexOf('data:') !== 0;
+  }
+  async function replaceImage(img){
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/*';
+    inp.onchange = () => {
+      const f = inp.files && inp.files[0];
+      if(!f) return;
+      const fr = new FileReader();
+      fr.onload = async () => {
+        say('이미지 저장 중…', 8000);
+        try{
+          const page = location.pathname.replace(/^\//,'') || 'index.html';
+          const r = await fetch('/api/image-replace', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ page, oldSrc: img.getAttribute('src'), image: { name: f.name, data: fr.result } }),
+          });
+          const j = await r.json();
+          if(j.ok){
+            img.src = j.newSrc;
+            const files = j.files || [];
+            say(`✅ 이미지 교체됨 — ${files.length}개 파일 반영`);
+          } else say('⚠️ 교체 실패: ' + (j.error || '파일에서 원본 주소를 찾지 못했습니다'), 6000);
+        }catch(err){ say('⚠️ 교체 실패: ' + (err.message||err), 6000); }
+      };
+      fr.readAsDataURL(f);
+    };
+    inp.click();
   }
 
   let hlEl = null;
@@ -80,6 +115,11 @@
       if(editing.el.contains(e.target)) return;   // 편집 중인 요소 내부 클릭은 통과
       e.preventDefault(); e.stopPropagation();
       finish(true);
+      return;
+    }
+    if(isImgTarget(e.target)){
+      e.preventDefault(); e.stopPropagation();
+      replaceImage(e.target);
       return;
     }
     let el = e.target;

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>TREVITY SEO 관리</title>
+<style>
+:root{--pri:#fa6781;--pri-dark:#e0536c;--pri-soft:#fff0f3;--bg:#F6F7F9;--line:#E5E8EB;--ink:#191F28;--sub:#8B95A1}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);margin:0;font-family:Pretendard,-apple-system,'Segoe UI',sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:36px 20px 80px}
+h1{font-size:24px;font-weight:800;letter-spacing:-.03em}
+h1 b{color:var(--pri)}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;margin-bottom:16px}
+.card h3{font-size:16px;font-weight:700;margin:0 0 6px}
+.note{font-size:13px;color:var(--sub);line-height:1.7;margin:0 0 14px}
+.fld{margin-bottom:12px}
+.fld label{display:block;font-size:13px;font-weight:600;color:#4E5968;margin-bottom:5px}
+.fld input,.fld textarea,.fld select{width:100%;border:1px solid var(--line);border-radius:7px;padding:10px 12px;font-size:14px;font-family:inherit}
+.fld textarea{resize:vertical;min-height:60px;line-height:1.6}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:700px){.grid2{grid-template-columns:1fr}}
+.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-pri{background:var(--pri);color:#fff}.btn-pri:hover{background:var(--pri-dark)}
+.btn-ghost{background:#fff;border:1px solid var(--line);color:#4E5968}
+.pgrow{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.pgrow .hd{display:flex;align-items:center;gap:8px;cursor:pointer}
+.pgrow .hd b{font-size:14px}
+.pgrow .hd .pg{font-size:12px;color:var(--sub)}
+.pgrow .hd .st{margin-left:auto;font-size:11px;font-weight:700;color:var(--sub)}
+.pgrow .bd{display:none;margin-top:12px}
+.pgrow.open .bd{display:block}
+.cnt{font-size:11px;color:var(--sub);text-align:right;margin-top:3px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);opacity:0;background:#191F28;color:#fff;
+  padding:12px 20px;border-radius:8px;font-size:13px;z-index:200;transition:opacity .25s;pointer-events:none}
+.toast.show{opacity:1}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.top .sp{flex:1}
+a.lnk{color:var(--pri);font-weight:700;text-decoration:none;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>TRE<b>VITY</b> SEO 관리</h1><span class="sp"></span>
+    <a class="lnk" href="/" target="_blank">사이트 열기 ↗</a>
+    <a class="lnk" href="/admin/" target="_blank">관리자 ↗</a>
+  </div>
+
+  <div class="card">
+    <h3>기술 SEO 일괄 굽기</h3>
+    <p class="note">canonical · og:url · 기본 키워드 · sitemap.xml · robots.txt · rss.xml ·
+      구조화데이터(Organization/LocalBusiness/BreadcrumbList/FAQPage 자동감지)를 전 페이지 HTML에 박습니다. 여러 번 눌러도 안전합니다.</p>
+    <button class="btn btn-pri" onclick="runTech(this)">전체 굽기 실행</button>
+    <span id="tech-out" class="note" style="margin-left:10px"></span>
+  </div>
+
+  <div class="card">
+    <h3>SEO 설정 (전 페이지 공통)</h3>
+    <div class="grid2">
+      <div class="fld"><label>사이트 도메인 (canonical·sitemap 기준)</label><input id="st-domain"></div>
+      <div class="fld"><label>사이트명</label><input id="st-siteName"></div>
+    </div>
+    <div class="fld"><label>Head 코드 (네이버·구글 소유확인 메타태그, 애널리틱스 등 — 그대로 붙여넣기)</label>
+      <textarea id="st-headCode" placeholder='&lt;meta name="naver-site-verification" content="..."/&gt;'></textarea></div>
+    <div class="grid2">
+      <div class="fld"><label>파비콘 업로드</label><input type="file" id="st-favicon" accept=".png,.ico,.svg,.jpg,.webp"></div>
+      <div class="fld"><label>대표 OG 이미지 업로드 (공유 미리보기)</label><input type="file" id="st-ogimage" accept="image/*"></div>
+    </div>
+    <h3 style="margin-top:18px">플로팅 SNS 버튼 (값 있는 것만 노출)</h3>
+    <div class="grid2">
+      <div class="fld"><label>카카오톡 채널 URL</label><input id="st-snsKakao" placeholder="https://pf.kakao.com/..."></div>
+      <div class="fld"><label>인스타그램 URL</label><input id="st-snsInstagram" placeholder="https://instagram.com/trevity__"></div>
+      <div class="fld"><label>블로그 URL</label><input id="st-snsBlog"></div>
+      <div class="fld"><label>전화번호</label><input id="st-snsPhone" placeholder="070-4212-8266"></div>
+    </div>
+    <button class="btn btn-pri" onclick="saveSettings(this)">설정 저장 · 전 페이지 굽기</button>
+  </div>
+
+  <div class="card">
+    <h3>페이지별 메타 (title · description · keywords)</h3>
+    <p class="note">저장하면 og:title / og:description 도 함께 맞춰서 HTML에 박습니다.
+      제목 30자 · 설명 80자 안팎 권장.</p>
+    <div id="seo-list"><p class="note">불러오는 중…</p></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+function toast(t){ const el=document.getElementById('toast'); el.textContent=t; el.classList.add('show');
+  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'), 2600); }
+function esc(s){ return String(s??'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+async function runTech(btn){
+  btn.disabled = true; btn.textContent = '굽는 중…';
+  try{
+    const r = await fetch('/api/seo-tech', {method:'POST'}).then(r=>r.json());
+    if(!r.ok) throw new Error(r.error||'실패');
+    document.getElementById('tech-out').textContent =
+      `✅ ${r.pages}페이지 굽기 완료 · sitemap ${r.sitemapUrls}개 URL · robots/rss 생성`;
+    toast('기술 SEO 굽기 완료');
+  }catch(e){ toast('실패: '+e.message); }
+  btn.disabled = false; btn.textContent = '전체 굽기 실행';
+}
+
+async function loadSettings(){
+  const st = await fetch('/api/settings').then(r=>r.json());
+  for(const k of ['domain','siteName','headCode','snsKakao','snsInstagram','snsBlog','snsPhone']){
+    const el = document.getElementById('st-'+k); if(el) el.value = st[k]||'';
+  }
+}
+function readFile(input){
+  return new Promise(res=>{
+    const f = input.files && input.files[0];
+    if(!f) return res(null);
+    const fr = new FileReader();
+    fr.onload = ()=>res({name:f.name, data:fr.result});
+    fr.readAsDataURL(f);
+  });
+}
+async function saveSettings(btn){
+  btn.disabled = true;
+  const body = {};
+  for(const k of ['domain','siteName','headCode','snsKakao','snsInstagram','snsBlog','snsPhone'])
+    body[k] = document.getElementById('st-'+k).value;
+  body.faviconData = await readFile(document.getElementById('st-favicon'));
+  body.ogImageData = await readFile(document.getElementById('st-ogimage'));
+  try{
+    const r = await fetch('/api/settings', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)}).then(r=>r.json());
+    if(!r.ok) throw new Error(r.error||'실패');
+    toast('✅ 설정 저장 · 전 페이지에 구워졌습니다');
+  }catch(e){ toast('실패: '+e.message); }
+  btn.disabled = false;
+}
+
+async function loadSeo(){
+  const list = await fetch('/api/seo').then(r=>r.json());
+  document.getElementById('seo-list').innerHTML = list.map(p=>`
+    <div class="pgrow" id="row-${p.page}">
+      <div class="hd" onclick="this.parentElement.classList.toggle('open')">
+        <b>${esc(p.label)}</b><span class="pg">${p.page}.html</span>
+        <span class="st">${esc((p.title||'').slice(0,34))}</span>
+      </div>
+      <div class="bd">
+        <div class="fld"><label>제목 (title)</label>
+          <input id="t-${p.page}" value="${esc(p.title)}" oninput="cnt('${p.page}')">
+          <div class="cnt" id="tc-${p.page}"></div></div>
+        <div class="fld"><label>설명 (description)</label>
+          <textarea id="d-${p.page}" oninput="cnt('${p.page}')">${esc(p.description)}</textarea>
+          <div class="cnt" id="dc-${p.page}"></div></div>
+        <div class="fld"><label>키워드 (쉼표 구분)</label>
+          <input id="k-${p.page}" value="${esc(p.keywords||p.defaultKeywords)}"></div>
+        <button class="btn btn-pri" onclick="saveSeo('${p.page}', this)">저장 · HTML에 굽기</button>
+      </div>
+    </div>`).join('');
+  list.forEach(p=>cnt(p.page));
+}
+function cnt(pg){
+  const t = document.getElementById('t-'+pg).value.length;
+  const d = document.getElementById('d-'+pg).value.length;
+  document.getElementById('tc-'+pg).textContent = t+'자';
+  document.getElementById('dc-'+pg).textContent = d+'자';
+}
+async function saveSeo(pg, btn){
+  btn.disabled = true;
+  try{
+    const r = await fetch('/api/seo', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({page:pg, meta:{
+        title: document.getElementById('t-'+pg).value,
+        description: document.getElementById('d-'+pg).value,
+        keywords: document.getElementById('k-'+pg).value,
+      }})}).then(r=>r.json());
+    if(!r.ok) throw new Error(r.error||'실패');
+    toast('✅ '+pg+'.html 메타 저장됨');
+    document.querySelector('#row-'+pg+' .st').textContent = document.getElementById('t-'+pg).value.slice(0,34);
+  }catch(e){ toast('실패: '+e.message); }
+  btn.disabled = false;
+}
+loadSettings(); loadSeo();
+</script>
+</body>
+</html>

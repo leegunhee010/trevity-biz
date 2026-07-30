@@ -4,17 +4,23 @@ HTML 파일에 바로 굽는다(정적 반영). 실행: python edit-server.py  �
 - GET  : 정적 서빙. *.html 에는 편집 오버레이(assets/js/edit-mode.js) 자동 주입
 - POST /api/bake : {page, replacements:[{old,new}]} → 해당 HTML 파일에서 문자열 치환 후 저장
 """
+import base64
+import hashlib
 import http.server
 import json
 import io
 import os
 import re
+import time
 import urllib.parse
+
+import seo_bake
 
 PORT = 5723
 ROOT = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_DIR = os.path.join(ROOT, "images", "uploads")
 
-INJECT = '<script src="/assets/js/edit-mode.js?v=1"></script>'
+INJECT = '<script src="/assets/js/edit-mode.js?v=2"></script>'
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -23,9 +29,22 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         path = urllib.parse.urlparse(self.path).path
+        if path == '/api/seo':
+            out = []
+            for page, label, prio, freq, kw in seo_bake.PAGES:
+                cur = seo_bake.read_meta(page)
+                if cur is not None:
+                    out.append({'page': page, 'label': label, 'defaultKeywords': kw, **cur})
+            self._json(out)
+            return
+        if path == '/api/settings':
+            self._json(seo_bake.settings())
+            return
         if path == '/':
             path = '/index.html'
         fs_path = os.path.normpath(os.path.join(ROOT, path.lstrip('/')))
+        if fs_path == os.path.join(ROOT, 'seo.html'):
+            return super().do_GET()   # SEO 관리 UI에는 편집 오버레이 미주입
         if fs_path.startswith(ROOT) and fs_path.endswith('.html') and os.path.isfile(fs_path):
             data = io.open(fs_path, encoding='utf-8').read()
             # </body> 마지막 위치에 편집 스크립트 주입
@@ -42,8 +61,122 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return
         super().do_GET()
 
+    def _json(self, obj, code=200):
+        out = json.dumps(obj, ensure_ascii=False).encode('utf-8')
+        self.send_response(code)
+        self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.send_header('Content-Length', str(len(out)))
+        self.end_headers()
+        self.wfile.write(out)
+
+    def _body(self):
+        n = int(self.headers.get('Content-Length', 0))
+        return json.loads(self.rfile.read(n).decode('utf-8')) if n else {}
+
     def do_POST(self):
-        if urllib.parse.urlparse(self.path).path != '/api/bake':
+        path = urllib.parse.urlparse(self.path).path
+
+        # ---------- SEO: 페이지별 메타 저장+굽기 ----------
+        if path == '/api/seo':
+            try:
+                d = self._body()
+                seo_bake.bake_meta(d['page'], d.get('meta', {}))
+                self._json({'ok': True})
+            except Exception as e:
+                self._json({'ok': False, 'error': str(e)}, 400)
+            return
+
+        # ---------- SEO: 기술 SEO 일괄 굽기 ----------
+        if path == '/api/seo-tech':
+            try:
+                r = seo_bake.bake_technical()
+                n = seo_bake.bake_settings()
+                self._json({'ok': True, **r, 'settingsPages': n})
+            except Exception as e:
+                self._json({'ok': False, 'error': str(e)}, 400)
+            return
+
+        # ---------- 설정 저장+굽기 (headCode·파비콘·og·SNS) ----------
+        if path == '/api/settings':
+            try:
+                d = self._body()
+                st = seo_bake.settings()
+                for k in ('domain', 'siteName', 'headCode',
+                          'snsKakao', 'snsInstagram', 'snsBlog', 'snsPhone'):
+                    if k in d:
+                        st[k] = d[k]
+                # 파비콘/OG 이미지: base64 업로드
+                for key, field in (('favicon', 'faviconData'), ('ogImage', 'ogImageData')):
+                    item = d.get(field)
+                    if item and item.get('data'):
+                        os.makedirs(UPLOAD_DIR, exist_ok=True)
+                        ext = os.path.splitext(item.get('name', ''))[1].lower() or '.png'
+                        if ext not in ('.png', '.ico', '.jpg', '.jpeg', '.webp', '.svg'):
+                            ext = '.png'
+                        name = key + '_' + hashlib.md5(str(time.time()).encode()).hexdigest()[:8] + ext
+                        raw = base64.b64decode(item['data'].split(',')[-1])
+                        io.open(os.path.join(UPLOAD_DIR, name), 'wb').write(raw)
+                        st[key] = 'images/uploads/' + name
+                seo_bake.save_settings(st)
+                seo_bake.bake_settings()
+                seo_bake.bake_sns()
+                self._json({'ok': True, 'settings': st})
+            except Exception as e:
+                self._json({'ok': False, 'error': str(e)}, 400)
+            return
+
+        # ---------- 이미지 교체 (편집모드에서 이미지 클릭) ----------
+        if path == '/api/image-replace':
+            try:
+                d = self._body()
+                page = (d.get('page') or 'index.html').lstrip('/').split('?')[0]
+                if '/' in page or not page.endswith('.html'):
+                    raise ValueError('bad page')
+                old_src = d.get('oldSrc', '')
+                item = d.get('image') or {}
+                if not old_src or not item.get('data'):
+                    raise ValueError('oldSrc/image 필요')
+                os.makedirs(UPLOAD_DIR, exist_ok=True)
+                ext = os.path.splitext(item.get('name', ''))[1].lower() or '.jpg'
+                if ext not in ('.jpg', '.jpeg', '.png', '.webp', '.gif'):
+                    ext = '.jpg'
+                name = 'rp_' + hashlib.md5((item.get('name', '') + str(time.time())).encode()).hexdigest()[:12] + ext
+                dst = os.path.join(UPLOAD_DIR, name)
+                io.open(dst, 'wb').write(base64.b64decode(item['data'].split(',')[-1]))
+                try:  # 큰 이미지 최적화 (PIL 있으면)
+                    from PIL import Image
+                    im = Image.open(dst)
+                    if max(im.size) > 1600:
+                        im.thumbnail((1600, 1600), Image.LANCZOS)
+                        im.save(dst)
+                except Exception:
+                    pass
+                new_src = './images/uploads/' + name
+                # 같은 src 를 쓰는 모든 루트 페이지에서 교체
+                changed = []
+                for fn in sorted(os.listdir(ROOT)):
+                    if not fn.endswith('.html') or fn.startswith('_') or '.bak' in fn or fn == 'rendered.html':
+                        continue
+                    fp = os.path.join(ROOT, fn)
+                    s = io.open(fp, encoding='utf-8').read()
+                    variants = [old_src]
+                    if old_src.startswith('./'):
+                        variants.append(old_src[2:])
+                    hits = 0
+                    for v in variants:
+                        c = s.count(v)
+                        if c:
+                            s = s.replace(v, new_src)
+                            hits += c
+                    if hits:
+                        io.open(fp, 'w', encoding='utf-8', newline='').write(s)
+                        changed.append({'file': fn, 'n': hits})
+                self._json({'ok': bool(changed), 'newSrc': new_src, 'files': changed})
+            except Exception as e:
+                self._json({'ok': False, 'error': str(e)}, 400)
+            return
+
+        if path != '/api/bake':
             self.send_error(404)
             return
         try:
