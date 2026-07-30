@@ -245,12 +245,11 @@ def bake_technical():
             s = s.replace("</head>", "<!--crumb-ld--><script type=\"application/ld+json\">"
                           + json.dumps(crumb, ensure_ascii=False) + "</script><!--/crumb-ld-->\n</head>", 1)
 
-        # 5) Organization + LocalBusiness (index만 2종, 나머지는 Organization 참조 불필요)
+        # 5) Organization + LocalBusiness — 인천 방식대로 전 페이지(회사 엔티티 사이트 전역)
         s = re.sub(r"<!--org-ld-->.*?<!--/org-ld-->", "", s, flags=re.S)
-        if page == "index":
-            lds = [organization_ld(domain), localbusiness_ld(domain)]
-            block = "".join('<script type="application/ld+json">' + json.dumps(x, ensure_ascii=False) + "</script>" for x in lds)
-            s = s.replace("</head>", "<!--org-ld-->" + block + "<!--/org-ld-->\n</head>", 1)
+        lds = [organization_ld(domain), localbusiness_ld(domain)]
+        block = "".join('<script type="application/ld+json">' + json.dumps(x, ensure_ascii=False) + "</script>" for x in lds)
+        s = s.replace("</head>", "<!--org-ld-->" + block + "<!--/org-ld-->\n</head>", 1)
 
         # 6) FAQPage JSON-LD 자동 (Q. 아코디언 있는 페이지)
         s = re.sub(r"<!--faq-ld-->.*?<!--/faq-ld-->", "", s, flags=re.S)
@@ -451,6 +450,13 @@ def bake_post(post):
           "mainEntityOfPage": url}
     if thumb:
         ld["image"] = domain + "/" + thumb.lstrip("./")
+    crumb = {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "홈", "item": domain + "/"},
+        {"@type": "ListItem", "position": 2, "name": "블로그", "item": domain + "/blog.html"},
+        {"@type": "ListItem", "position": 3, "name": title, "item": url},
+    ]}
+    kw = post.get("category", "") + ", 트래비티, 인플루언서 마케팅"
+    og_img = (domain + "/" + thumb.lstrip("./")) if thumb else ""
     html = f'''<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -461,8 +467,11 @@ def bake_post(post):
 <meta property="og:description" content="{desc}"/>
 <meta property="og:type" content="article"/>
 <meta property="og:url" content="{url}"/>
+{f'<meta property="og:image" content="{og_img}"/>' if og_img else ''}
+<meta name="keywords" content="{kw}"/>
 <link rel="canonical" href="{url}">
 <script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>
+<script type="application/ld+json">{json.dumps(crumb, ensure_ascii=False)}</script>
 {links}
 {styles}
 </head>
