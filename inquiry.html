@@ -17,6 +17,25 @@ img[src*="request-form"],img[src*="recommendation-list"],img[src*="price-search-
 .tvh-dd-in{background:#fff;border:1px solid #f0f0f0;border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,0.12);padding:10px;min-width:236px}
 .tvh-dd-in a{display:block;padding:10px 14px;border-radius:8px;font-size:14px;letter-spacing:-0.28px;color:#595959;text-decoration:none;white-space:nowrap}
 .tvh-dd-in a:hover{background:#fff0f3;color:#fa6781}
+.tvh-sub{position:relative}
+.tvh-sub>a .tvh-arr{float:right;margin-left:14px;color:#c9c9cf;font-weight:700}
+.tvh-sub-dd{display:none;position:absolute;left:100%;top:-10px;padding-left:6px;z-index:62}
+.tvh-sub-dd-in{background:#fff;border:1px solid #f0f0f0;border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,0.12);padding:10px;min-width:216px}
+.tvh-sub:hover .tvh-sub-dd{display:block}
+.tvh-sub:hover>a{background:#fff0f3;color:#fa6781;border-radius:8px}
+.tvh-mega{display:flex;gap:10px;padding:12px}
+.tvh-brand{width:168px;border-radius:12px;background:linear-gradient(160deg,rgba(250,103,129,0.72),rgba(255,157,176,0.45)),url('./assets/tvhero/hero_bg_pink.jpg') center/cover;display:flex;align-items:center;justify-content:center;padding:22px 14px;flex:none}
+.tvh-brand img{width:104px;height:auto;display:block;filter:drop-shadow(0 2px 8px rgba(167,43,65,0.25))}
+.tvh-items{display:flex;flex-direction:column;gap:2px;min-width:252px}
+.tvh-items a{display:block;padding:10px 14px;border-radius:10px;text-decoration:none;white-space:nowrap}
+.tvh-items a:hover{background:#fff0f3}
+.tvh-items a b{display:block;font-size:14.5px;font-weight:700;color:#26262b;letter-spacing:-0.29px}
+.tvh-items a:hover b{color:#fa6781}
+.tvh-items a small{display:block;font-size:12.5px;color:#8c8c8c;margin-top:3px;letter-spacing:-0.25px}
+.tvh-items .dv{height:1px;background:#f3f3f5;margin:6px 10px}
+.tvh-items a.sub{margin-left:12px;border-left:2px solid #ffd3dc;border-radius:0 10px 10px 0}
+@media (max-width:767px){.tvh-mega{display:block;padding:0}.tvh-brand{display:none}.tvh-items{min-width:0}.tvh-items a{padding:11px 36px;white-space:normal}.tvh-items a.sub{margin-left:14px}}
+@media (max-width:767px){.tvh-sub-dd{display:block;position:static;padding-left:0}.tvh-sub-dd-in{border:none;box-shadow:none;border-radius:0;background:transparent;padding:0}.tvh-sub-dd-in a{padding:11px 52px;font-size:14px}}
 .tvh-cta{display:inline-block;margin-left:10px;height:40px;line-height:40px;padding:0 20px;border-radius:8px;background:#fa6781;color:#fff;font-size:14px;font-weight:700;letter-spacing:-0.28px;text-decoration:none;white-space:nowrap}
 .tvh-cta:hover{opacity:.85}
 .tvh-mtg{display:none}
@@ -36,6 +55,21 @@ img[src*="request-form"],img[src*="recommendation-list"],img[src*="price-search-
 .tvh-cta{order:2;margin-left:auto;height:32px;line-height:32px;padding:0 12px;font-size:13px}
 .tvh-burger{order:3}
 }
+
+/* tvh-inf */
+.tvh-inf{position:relative;flex:none;margin-left:14px}
+.tvh-inf>a{display:inline-block;box-sizing:border-box;height:40px;line-height:38px;padding:0 16px;
+  border:1px solid #fa6781;border-radius:8px;background:#fff;color:#fa6781;font-size:14px;
+  font-weight:700;letter-spacing:-0.28px;text-decoration:none;white-space:nowrap;transition:background .2s}
+.tvh-inf>a:hover{background:#fff0f3}
+.tvh-inf .tvh-dd{left:auto;right:0;transform:none}
+.tvh-inf:hover .tvh-dd{display:block}
+.tvh-inf-m{display:none}
+@media (max-width:767px){
+.tvh-inf{display:none}
+.tvh-inf-m{display:block}
+.tvh-inf-m>a{color:#fa6781!important;font-weight:700}
+}
 </style></head><style id="inquiry-style">
 html{scroll-behavior:smooth}
 .iq-hero{background:linear-gradient(180deg,#ffe9ee,#fff);padding:150px 20px 48px;text-align:center}
@@ -54,8 +88,8 @@ html{scroll-behavior:smooth}
 .iq-pkg input{display:none}
 .iq-pkg span{display:block;text-align:center;border:1.5px solid #e5e7eb;border-radius:10px;padding:13px 8px;font-size:14.5px;letter-spacing:-0.29px;color:#595959;cursor:pointer;transition:all .15s}
 .iq-pkg input:checked+span{border-color:#fa6781;background:#fff0f3;color:#fa6781;font-weight:700}
-.iq-agree{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:#737373;line-height:1.6;letter-spacing:-0.27px}
-.iq-agree input{margin-top:3px;accent-color:#fa6781;width:16px;height:16px}
+.iq-row label.iq-agree{display:flex;align-items:flex-start;gap:12px;font-size:13.5px;font-weight:400;color:#737373;line-height:1.6;letter-spacing:-0.27px;cursor:pointer}
+.iq-row label.iq-agree input{margin:3px 0 0;accent-color:#fa6781;width:17px;height:17px;flex:none}
 .iq-submit{width:100%;height:58px;border:none;border-radius:12px;background:#fa6781;color:#fff;font-size:17px;font-weight:700;letter-spacing:-0.34px;font-family:inherit;cursor:pointer;transition:opacity .15s;margin-top:8px}
 .iq-submit:hover{opacity:.85}
 .iq-submit:disabled{background:#e5e7eb;color:#9ca3af;cursor:default}
@@ -66,7 +100,7 @@ html{scroll-behavior:smooth}
 .iq-done a{display:inline-block;border-radius:10px;background:#fa6781;color:#fff;font-weight:700;font-size:15px;padding:13px 26px;text-decoration:none}
 .iq-note{margin-top:20px;text-align:center;font-size:13.5px;color:#8c8c8c;letter-spacing:-0.27px}
 @media (max-width:767px){.iq-hero{padding-top:110px}.iq-hero h1{font-size:30px}.iq-card{padding:32px 22px}.iq-grid2{grid-template-columns:1fr}.iq-pkg{grid-template-columns:1fr 1fr}}
-</style><body class="max-[767px]:min-w-[360px] min-[767px]:min-w-[1440px]"><header class="tvh"><div class="tvh-in"><a class="tvh-logo" href="./"><img src="./trevity-logo.png" alt="trevity"/></a><input type="checkbox" id="tvh-mtg" class="tvh-mtg"/><label for="tvh-mtg" class="tvh-burger" aria-label="메뉴"><span></span><span></span><span></span></label><nav class="tvh-nav"><ul><li><a href="./about.html">트래비티소개</a><div class="tvh-dd"><div class="tvh-dd-in"><a href="./about.html">트래비티</a><a href="./about.html">트래비티 글로벌</a></div></div></li><li><a href="https://kr.trevity.com">체험단 마케팅</a><div class="tvh-dd"><div class="tvh-dd-in"><a href="https://kr.trevity.com" target="_blank">방문체험단</a><a href="./experience.html#product">제품체험단</a></div></div></li><li><a href="./vietnam-tiktok.html">한국제품 해외수출 마케팅</a><div class="tvh-dd"><div class="tvh-dd-in"><a href="./vietnam-tiktok.html">베트남 인플루언서 틱톡 체험단</a><a href="./export.html#cn">중국 인플루언서 샤오홍슈 체험단</a><a href="./export.html#tw">대만 인플루언서 인스타 체험단</a><a href="./export.html#jp">일본 인플루언서 인스타 체험단</a><a href="./export.html#th">태국 인플루언서 틱톡 체험단</a><a href="./export.html#mm">미얀마 인플루언서 틱톡 체험단</a></div></div></li><li><a href="./tourist.html#vn">외국인 관광객 마케팅</a><div class="tvh-dd"><div class="tvh-dd-in"><a href="./tourist.html#vn">베트남인 관광객 유학생 체험단</a><a href="./tourist.html#cn">중국인 관광객 유학생 체험단</a><a href="./tourist.html#tw">대만인 관광객 유학생 체험단</a><a href="./tourist.html#jp">일본인 관광객 유학생 체험단</a><a href="./tourist.html#th">태국인 관광객 유학생 체험단</a><a href="./tourist.html#mm">미얀마인 관광객 유학생 체험단</a></div></div></li><li><a href="./local.html#vn">해외 현지 마케팅</a><div class="tvh-dd"><div class="tvh-dd-in"><a href="./local.html#vn">베트남 현지 매장홍보 마케팅</a><a href="./local.html#cn">중국 현지 매장홍보 마케팅</a><a href="./local.html#tw">대만 현지 매장홍보 마케팅</a><a href="./local.html#jp">일본 현지 매장홍보 마케팅</a><a href="./local.html#th">태국 현지 매장홍보 마케팅</a><a href="./local.html#mm">미얀마 현지 매장홍보 마케팅</a></div></div></li><li><a href="./stay.html#hotel">숙박 체험단</a><div class="tvh-dd"><div class="tvh-dd-in"><a href="./stay.html#hotel">내국인 관광객 호텔 체험단</a><a href="./stay.html#pension">내국인 관광객 펜션 체험단</a><a href="./stay.html#foreign">외국인 관광객 숙박 체험단</a></div></div></li><li><a href="./famtour.html#sp-kr">팸투어 마케팅</a><div class="tvh-dd"><div class="tvh-dd-in"><a href="./famtour.html#sp-kr">내국인 관광객 서포터즈 운영대행</a><a href="./famtour.html#sp-fr">외국인 관광객 서포터즈 운영대행</a><a href="./famtour.html#mega">외국인 메가 인플루언서 팸투어대행</a><a href="./famtour.html#gov">지자체 지역 홍보 대행</a></div></div></li><li><a href="./blog.html">블로그</a></li><li class="on"><a href="./help.html">고객센터</a><div class="tvh-dd"><div class="tvh-dd-in"><a href="./help.html">종합 헬프센터</a><a href="./help.html#agency">공식대행사</a><a href="./inquiry.html">제휴 문의</a></div></div></li></ul></nav><a class="tvh-cta" href="./inquiry.html">문의하기</a></div></header>
+</style><body class="max-[767px]:min-w-[360px] min-[767px]:min-w-[1440px]"><header class="tvh"><div class="tvh-in"><a class="tvh-logo" href="./"><img src="./trevity-logo.png" alt="trevity"/></a><input type="checkbox" id="tvh-mtg" class="tvh-mtg"/><label for="tvh-mtg" class="tvh-burger" aria-label="메뉴"><span></span><span></span><span></span></label><nav class="tvh-nav"><ul><li><a href="./vietnam-tiktok.html">한국제품 해외수출 마케팅</a></li><li><a href="./tourist-vn.html">외국인 관광객 마케팅</a><div class="tvh-dd"><div class="tvh-dd-in tvh-mega"><div class="tvh-brand"><img src="./trevity-logo-white.png" alt="trevity"/></div><div class="tvh-items"><a href="./tourist-vn.html"><b>베트남인 관광객·유학생 체험단</b><small>방한 베트남인이 매장을 체험하고 베트남 SNS에 알립니다</small></a><a href="./tourist-cn.html"><b>중국인 관광객·유학생 체험단</b><small>샤오홍슈·더우인으로 중국인 손님을 데려옵니다</small></a></div></div></div></li><li><a href="./local-vn.html">해외 현지 마케팅</a><div class="tvh-dd"><div class="tvh-dd-in tvh-mega"><div class="tvh-brand"><img src="./trevity-logo-white.png" alt="trevity"/></div><div class="tvh-items"><a href="./local-vn.html"><b>베트남 현지 매장 마케팅</b><small>세 방향의 손님을 한 번에 — 전체 보기</small></a><div class="dv"></div><a class="sub" href="./local-vn.html#local"><b>베트남 로컬 손님 유치</b><small>로컬 틱톡 · 페이스북 인플루언서</small></a><a class="sub" href="./local-vn.html#chinese"><b>중국인 관광객 손님 유치</b><small>더우인 · 따중디엔핑 후기</small></a><a class="sub" href="./local-vn.html#korean"><b>한국인 관광객 손님 유치</b><small>네이버 블로그 · 인스타그램</small></a></div></div></div></li><li><a href="./stay.html">숙박 체험단</a></li><li><a href="./blog.html">블로그</a></li><li class="on"><a href="./help.html">고객센터</a><div class="tvh-dd"><div class="tvh-dd-in tvh-mega"><div class="tvh-brand"><img src="./trevity-logo-white.png" alt="trevity"/></div><div class="tvh-items"><a href="./help.html"><b>종합 헬프센터</b><small>자주 묻는 질문과 이용 안내</small></a><a href="./agency.html"><b>공식대행사</b><small>트래비티 공식 파트너 안내</small></a></div></div></div></li><li class="tvh-inf-m"><a href="https://kr.trevity.com" target="_blank">인플루언서라면?</a><div class="tvh-dd"><div class="tvh-dd-in tvh-mega"><div class="tvh-brand"><img src="./trevity-logo-white.png" alt="trevity"/></div><div class="tvh-items"><a href="https://kr.trevity.com" target="_blank"><b>한국 인플루언서</b><small>트래비티 인플루언서 신청</small></a><a href="https://vn.trevity.com" target="_blank"><b>베트남 인플루언서</b><small>Đăng ký Influencer TREVITY</small></a><a href="https://cn.trevity.com" target="_blank"><b>중국 인플루언서</b><small>申请成为 TREVITY 达人</small></a><a href="https://mm.trevity.com" target="_blank"><b>미얀마 인플루언서</b><small>TREVITY Influencer လျှောက်ထားရန်</small></a></div></div></div></li></ul></nav><div class="tvh-inf"><a href="https://kr.trevity.com" target="_blank">인플루언서라면?</a><div class="tvh-dd"><div class="tvh-dd-in tvh-mega"><div class="tvh-brand"><img src="./trevity-logo-white.png" alt="trevity"/></div><div class="tvh-items"><a href="https://kr.trevity.com" target="_blank"><b>한국 인플루언서</b><small>트래비티 인플루언서 신청</small></a><a href="https://vn.trevity.com" target="_blank"><b>베트남 인플루언서</b><small>Đăng ký Influencer TREVITY</small></a><a href="https://cn.trevity.com" target="_blank"><b>중국 인플루언서</b><small>申请成为 TREVITY 达人</small></a><a href="https://mm.trevity.com" target="_blank"><b>미얀마 인플루언서</b><small>TREVITY Influencer လျှောက်ထားရန်</small></a></div></div></div></div><a class="tvh-cta" href="./inquiry.html">문의하기</a></div></header>
 <div class="iq-hero">
   <h1>문의하기</h1>
   <p>남겨주시면 베트남 담당 매니저가 하루 안에 연락드립니다.<br>패키지가 고민되시면 비워두셔도 괜찮습니다.</p>
@@ -82,26 +116,28 @@ html{scroll-behavior:smooth}
         <div class="iq-row"><label>연락처 <span class="req">*</span></label><input type="tel" name="phone" required placeholder="010-0000-0000"/></div>
         <div class="iq-row"><label>이메일</label><input type="email" name="email" placeholder="example@brand.com"/></div>
       </div>
-      <div class="iq-row"><label>제품 카테고리</label>
+      <div class="iq-row"><label>업종 · 제품 카테고리</label>
         <select name="category">
           <option value="">선택해 주세요</option>
           <option>뷰티 · 스킨케어</option>
           <option>식품 · F&amp;B</option>
           <option>패션 · 잡화</option>
           <option>생활용품 · 리빙</option>
-          <option>매장 (식당 · 카페 등)</option>
+          <option>매장 (식당 · 카페 · 뷰티샵)</option>
+          <option>숙박 (호텔 · 펜션)</option>
           <option>기타</option>
         </select>
       </div>
-      <div class="iq-row"><label>관심 패키지</label>
+      <div class="iq-row"><label>필요한 서비스</label>
         <div class="iq-pkg">
-          <label><input type="radio" name="package" value="스타터 10명"/><span>스타터 · 10명</span></label>
-          <label><input type="radio" name="package" value="그로스 20명"/><span>그로스 · 20명</span></label>
-          <label><input type="radio" name="package" value="도미넌트 50명"/><span>도미넌트 · 50명</span></label>
-          <label><input type="radio" name="package" value="상담 후 결정"/><span>상담 후 결정할게요</span></label>
+          <label><input type="radio" name="package" value="한국제품 해외수출"/><span>해외에 제품 판매</span></label>
+          <label><input type="radio" name="package" value="외국인 관광객 마케팅"/><span>한국 매장 · 외국인 손님</span></label>
+          <label><input type="radio" name="package" value="베트남 현지 매장"/><span>베트남 현지 매장</span></label>
+          <label><input type="radio" name="package" value="숙박 체험단"/><span>숙박 체험단 (0원)</span></label>
+          <label><input type="radio" name="package" value="상담 후 결정"/><span>아직 모르겠어요</span></label>
         </div>
       </div>
-      <div class="iq-row"><label>문의 내용</label><textarea name="message" placeholder="제품 소개, 캠페인 목표, 일정 등 편하게 남겨주세요."></textarea></div>
+      <div class="iq-row"><label>문의 내용</label><textarea name="message" placeholder="상황을 편하게 적어주세요. 예) 호치민에서 한식당 운영 중인데 로컬 손님을 늘리고 싶어요."></textarea></div>
       <div class="iq-row"><label class="iq-agree"><input type="checkbox" id="iq-agree"/><span>개인정보 수집 및 이용에 동의합니다. 수집된 정보(회사명, 성함, 연락처, 이메일)는 상담 목적으로만 사용되며, 상담 완료 후 파기됩니다.</span></label></div>
       <button type="submit" class="iq-submit" id="iq-btn">문의 접수하기</button>
     </form>
@@ -112,12 +148,18 @@ html{scroll-behavior:smooth}
       <a href="./">홈으로 돌아가기</a>
     </div>
   </div>
-  <p class="iq-note">전화가 편하시면 상담 가능 시간에 연락 주세요 · (트래비티 연락처 기입)</p>
+  <p class="iq-note">전화가 편하시면 상담 가능 시간에 연락 주세요 · 070-4212-8266</p>
 </div>
+<script src="./assets/js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="./assets/js/data.js"></script>
+<script src="./assets/js/store.js"></script>
+<script src="./assets/js/upload.js"></script>
+<script src="./assets/js/store-supabase.js"></script>
+<script src="./assets/js/site-data.js"></script>
 <script>
 (function () {
-  // 구글 Apps Script 웹앱 URL을 배포 후 여기에 넣으세요 (비어 있으면 접수 화면만 표시)
-  var SHEET_ENDPOINT = '';
+  TvBoot();
   var form = document.getElementById('iq-form');
   var btn = document.getElementById('iq-btn');
   form.addEventListener('submit', function (e) {
@@ -130,19 +172,35 @@ html{scroll-behavior:smooth}
     if (!document.getElementById('iq-agree').checked) { alert('개인정보 수집 및 이용에 동의해 주세요.'); return; }
     btn.disabled = true;
     btn.textContent = '접수 중...';
-    var data = new FormData(form);
-    data.append('page', 'trevity-kol-booking');
-    data.append('ts', new Date().toISOString());
     function done() {
       form.style.display = 'none';
       document.getElementById('iq-done').style.display = 'block';
       window.scrollTo(0, 0);
     }
-    if (!SHEET_ENDPOINT) { console.warn('SHEET_ENDPOINT 미설정 — 접수 데이터가 저장되지 않습니다.'); done(); return; }
-    fetch(SHEET_ENDPOINT, { method: 'POST', mode: 'no-cors', body: data })
-      .then(done)
-      .catch(function () { btn.disabled = false; btn.textContent = '문의 접수하기'; alert('접수 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.'); });
+    var fd = form.elements;
+    var extra = [];
+    if (fd.category && fd.category.value) extra.push('업종: ' + fd.category.value);
+    var pkg = form.querySelector('input[name="package"]:checked');
+    if (pkg) extra.push('서비스: ' + pkg.value);
+    var msg = (fd.message.value || '').trim();
+    if (extra.length) msg = extra.join(' / ') + (msg ? '\n\n' + msg : '');
+    Store.submitInquiry({
+      company: fd.company.value.trim(), name: fd.name.value.trim(),
+      phone: fd.phone.value.trim(), email: fd.email.value.trim(),
+      message: msg, source_page: 'inquiry.html',
+    }).then(function (r) {
+      if (r && r.ok) { done(); return; }
+      btn.disabled = false; btn.textContent = '문의 접수하기';
+      alert('접수 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+    }).catch(function () {
+      btn.disabled = false; btn.textContent = '문의 접수하기';
+      alert('접수 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+    });
   });
 })();
 </script>
-<footer class="bg-gray-800 max-[767px]:px-[20px] max-[767px]:py-[40px] min-[767px]:px-[178px] min-[767px]:py-[64px]"><div class="mx-auto max-w-content-max-width"><div class="flex justify-between max-[767px]:flex-col max-[767px]:gap-[24px] min-[767px]:flex-row"><div class="flex flex-wrap gap-[54px]"><div class="flex flex-col gap-[16px]"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-400">서비스</span><a href="./macro"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">스타터 · 10명</span></a><a href="./micro"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">그로스 · 20명</span></a><a href="./nano"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">도미넌트 · 50명</span></a><a href="./search-influencer"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">인플루언서 분석</span></a><a href="./search-ad-contents"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">광고 콘텐츠 분석</span></a></div><div class="flex flex-col gap-[16px]"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-400">블로그</span><a href="./blog.html"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">인사이트</span></a><a href="./blog?category=고객 사례"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">고객 사례</span></a></div><div class="flex flex-col gap-[16px]"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-400">지원</span><a target="_blank" href="https://clacorp.notion.site/guide-cre?v=174def13707881d3853e000c6e72701d"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">사용 가이드</span></a><a target="_blank" href="https://clacorp.notion.site/174def137078815698b4fbc97b5dfd22?v=174def13707881338f4f000cf5a78c9e"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">자주 묻는 질문</span></a></div><div class="flex flex-col gap-[16px]"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-400">회사</span><a href="./about.html"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">회사소개</span></a><a target="_blank" href="https://clacorp.career.greetinghr.com/ko/intro"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">채용</span></a><a target="_blank" href="https://clacorp.notion.site/4f977b84dade449dba18b965293f0ecf"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">이용약관</span></a><a target="_blank" href="https://clacorp.notion.site/b5855278d8e347f79e26e581b6173923"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">개인정보취급방침</span></a></div></div><div class="flex flex-col gap-[24px]"><div class="flex flex-col gap-[8px]"><h6 class="text-[18px] font-[700] leading-[1.5] -tracking-[0.36px] text-gray-30">고객 지원</h6><span class="text-[16px] font-[400] leading-[1.6] -tracking-[0.32px] text-gray-30">평일 10:00 ~ 18:00 (주말, 공휴일 제외)</span><span class="text-[16px] font-[400] leading-[1.6] -tracking-[0.32px] text-gray-30">이메일 : (트래비티 이메일 기입)</span><span class="text-[16px] font-[400] leading-[1.6] -tracking-[0.32px] text-gray-30">전화 : (트래비티 연락처 기입)</span></div><a href="./inquiry.html"><button type="button" class="transition-colors duration-200 bg-gray-50 text-gray-600 disabled:text-gray-200 disabled:bg-gray-50 hover:bg-gray-100 h-[40px] rounded-[4px] px-[16px] text-[14px] font-[500] w-[128px]">문의하기</button></a></div></div><div class="flex-none" style="height: 56px;"></div><div class="min-w-full bg-gray-200" style="min-height: 1px;"></div><div class="flex-none" style="height: 24px;"></div><div class="flex flex-col gap-[8px]"><div class="flex gap-[24px] max-[767px]:flex-wrap"><span class="text-[14px] font-[400] leading-[1.6] -tracking-[0.28px] text-gray-200">트래비티(TREVITY) | 글로벌 인플루언서 마케팅 그룹 | 서울 · 호치민 · 다낭 · 대구 | (사업자 정보 기입)</span></div><span class="text-[14px] font-[400] leading-[1.6] -tracking-[0.28px] text-gray-200">@2026 TREVITY. All rights reserved</span></div></div></footer><script src="./mirror.js?v=2"></script></body></html>
+<footer class="bg-gray-800 max-[767px]:px-[20px] max-[767px]:py-[40px] min-[767px]:px-[178px] min-[767px]:py-[64px]"><div class="mx-auto max-w-content-max-width"><div class="flex justify-between max-[767px]:flex-col max-[767px]:gap-[24px] min-[767px]:flex-row"><div class="flex flex-wrap gap-[54px]"><div class="flex flex-col gap-[16px]"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-400">서비스</span><a href="./vietnam-tiktok.html"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">한국제품 해외수출 마케팅</span></a><a href="./tourist-vn.html"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">외국인 관광객 마케팅</span></a><a href="./local-vn.html"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">베트남 현지 매장 마케팅</span></a><a href="./stay.html"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">숙박 체험단</span></a></div><div class="flex flex-col gap-[16px]"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-400">블로그</span><a href="./blog.html"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">인사이트</span></a><a href="./blog.html"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">고객 사례</span></a></div><div class="flex flex-col gap-[16px]"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-400">지원</span><a href="./help.html"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">사용 가이드</span></a><a href="./help.html"><span class="text-[14px] font-[500] leading-[1.5] -tracking-[0.28px] text-gray-30">자주 묻는 질문</span></a></div></div><div class="flex flex-col gap-[24px]"><div class="flex flex-col gap-[8px]"><h6 class="text-[18px] font-[700] leading-[1.5] -tracking-[0.36px] text-gray-30">고객 지원</h6><span class="text-[16px] font-[400] leading-[1.6] -tracking-[0.32px] text-gray-30">평일 10:00 ~ 18:00 (주말, 공휴일 제외)</span><span class="text-[16px] font-[400] leading-[1.6] -tracking-[0.32px] text-gray-30">이메일 : notice@trevity.com</span><span class="text-[16px] font-[400] leading-[1.6] -tracking-[0.32px] text-gray-30">전화 : 070-4212-8266</span></div><a href="./inquiry.html"><button type="button" class="transition-colors duration-200 bg-gray-50 text-gray-600 disabled:text-gray-200 disabled:bg-gray-50 hover:bg-gray-100 h-[40px] rounded-[4px] px-[16px] text-[14px] font-[500] w-[128px]">문의하기</button></a></div></div><div class="flex-none" style="height: 56px;"></div><div class="min-w-full bg-gray-200" style="min-height: 1px;"></div><div class="flex-none" style="height: 24px;"></div><div class="flex flex-col gap-[8px]"><div class="flex gap-[24px] max-[767px]:flex-wrap"><span class="text-[14px] font-[400] leading-[1.6] -tracking-[0.28px] text-gray-200">주식회사 퍼스트마케팅컴퍼니 | 대표이사 : 김우석 | 사업자등록번호 : 884-88-01123 | 통신판매업신고번호 : 2021-대구동구-0697<br>주소 : 대구광역시 중구 국채보상로 488 (동산동) 섬유회관 3층 | 이메일 : notice@trevity.com | 전화 : 070-4212-8266<br>트래비티(TREVITY)는 주식회사 퍼스트마케팅컴퍼니의 글로벌 인플루언서 마케팅 브랜드입니다 | 서울 · 대련 · 호치민 · 대구</span></div><span class="text-[14px] font-[400] leading-[1.6] -tracking-[0.28px] text-gray-200">@2026 TREVITY. All rights reserved</span></div></div></footer><script src="./mirror.js?v=2"></script><script>/* ?svc= preselect */
+(function(){var map={export:'한국제품 해외수출',tourist:'외국인 관광객 마케팅',local:'베트남 현지 매장',stay:'숙박 체험단'};
+var v=new URLSearchParams(location.search).get('svc');
+if(v&&map[v]){var r=document.querySelector('input[name="package"][value="'+map[v]+'"]');if(r)r.checked=true;}})();
+</script></body></html>
