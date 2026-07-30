@@ -146,9 +146,12 @@
         body: JSON.stringify({ page, replacements: reps }),
       });
       const j = await r.json();
-      const okN = (j.results||[]).filter(x=>x.ok).length;
-      if(j.ok && okN){
-        say(`✅ 저장됨 — ${page} 파일에 반영 (${okN}곳)`);
+      const files = j.files || [];
+      if(j.ok && files.length){
+        const label = files.length === 1
+          ? `${files[0].file} (${files[0].n}곳)`
+          : `${files.length}개 파일 · 총 ${files.reduce((s,f)=>s+f.n,0)}곳`;
+        say(`✅ 저장됨 — ${label} HTML에 반영`);
         // 런타임 카피 오버라이드가 남아 있으면 충돌하므로 같은 키를 지운다
         try{
           const m = JSON.parse(localStorage.getItem('tv_copy_override')||'{}');

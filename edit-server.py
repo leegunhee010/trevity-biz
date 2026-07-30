@@ -59,32 +59,52 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if not os.path.isfile(fs_path):
                 raise ValueError('no such page: ' + page)
 
-            data = io.open(fs_path, encoding='utf-8').read()
+            # 같은 문구(헤더·푸터 등)가 다른 페이지에도 있으면 함께 굽는다.
+            # 우선순위: 현재 페이지 먼저, 이후 나머지 루트 .html (작업 파일 _*, *.bak* 제외)
+            targets = [page]
+            for fn in sorted(os.listdir(ROOT)):
+                if not fn.endswith('.html') or fn == page:
+                    continue
+                if fn.startswith('_') or '.bak' in fn or fn == 'rendered.html':
+                    continue
+                targets.append(fn)
+
             results = []
-            changed = False
-            for r in reps:
-                old, new = r.get('old', ''), r.get('new', '')
-                if not old or old == new:
-                    results.append({'ok': False, 'why': 'empty-or-same'})
+            files_changed = []
+            cur_page_hit = False
+            for fn in targets:
+                fp = os.path.join(ROOT, fn)
+                if not os.path.isfile(fp):
                     continue
-                cnt = data.count(old)
-                if cnt == 0:
-                    # 폴백: <br> vs <br/> 표기 차이 흡수
-                    old2 = old.replace('<br>', '<br/>')
-                    cnt2 = data.count(old2)
-                    if cnt2:
-                        data = data.replace(old2, new)
-                        results.append({'ok': True, 'n': cnt2, 'via': 'br-fallback'})
-                        changed = True
+                data = io.open(fp, encoding='utf-8').read()
+                changed = False
+                hits = 0
+                for r in reps:
+                    old, new = r.get('old', ''), r.get('new', '')
+                    if not old or old == new:
                         continue
-                    results.append({'ok': False, 'why': 'not-found'})
-                    continue
-                data = data.replace(old, new)
-                results.append({'ok': True, 'n': cnt})
-                changed = True
-            if changed:
-                io.open(fs_path, 'w', encoding='utf-8', newline='').write(data)
-            out = json.dumps({'ok': changed, 'results': results}, ensure_ascii=False).encode('utf-8')
+                    cnt = data.count(old)
+                    if cnt == 0:
+                        # 폴백: <br> vs <br/> 표기 차이 흡수
+                        old2 = old.replace('<br>', '<br/>')
+                        cnt = data.count(old2)
+                        if cnt:
+                            data = data.replace(old2, new)
+                            changed = True
+                            hits += cnt
+                        continue
+                    data = data.replace(old, new)
+                    changed = True
+                    hits += cnt
+                if changed:
+                    io.open(fp, 'w', encoding='utf-8', newline='').write(data)
+                    files_changed.append({'file': fn, 'n': hits})
+                    if fn == page:
+                        cur_page_hit = True
+            results = files_changed
+            out = json.dumps({'ok': cur_page_hit or bool(files_changed),
+                              'results': results, 'files': files_changed},
+                             ensure_ascii=False).encode('utf-8')
             self.send_response(200)
             self.send_header('Content-Type', 'application/json; charset=utf-8')
             self.send_header('Content-Length', str(len(out)))
