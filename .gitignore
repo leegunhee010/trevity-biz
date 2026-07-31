@@ -16,3 +16,13 @@ urls.txt
 *-report.txt
 _part_*.html
 _tmp.png
+
+# 작업 중 백업·정크 (커밋 금지)
+*.bak_*
+_bak_*.html
+_*.png
+_*.jpg
+__pycache__/
+.superpowers/
+_pfthumbs/
+_map_patched.svg.txt
