@@ -151,6 +151,40 @@
     msg.textContent = t; msg.style.display = 'block';
     clearTimeout(say._t); say._t = setTimeout(()=>{ msg.style.display='none'; }, ms||2600);
   }
+
+  /* ---------- 관리자 카피탭 "페이지에서 열기" 점프 (?find=키) ----------
+     해당 문구로 스크롤 + 편집모드 자동 켜기 + 바로 편집 시작 */
+  const FIND_KEY = (location.search.match(/[?&]find=(c[0-9a-f]+)/) || [])[1];
+  if(FIND_KEY){
+    const tryFind = (attempt) => {
+      let target = document.querySelector(`[data-tvck="${FIND_KEY}"]`);
+      if(!target){
+        for(const el of document.body.querySelectorAll(TAGS)){
+          if(el.closest('#tvedit-bar')) continue;
+          if(el.querySelector && el.querySelector('svg,img,video,iframe,input,select,textarea,button')) continue;
+          if(!allInline(el)) continue;
+          const t = tvText(el);
+          if(t && tvCopyKey_(t) === FIND_KEY){ target = el; break; }
+        }
+      }
+      if(target){
+        setOn(true);
+        target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        setTimeout(()=>{ start(target); }, 600);
+      } else if(attempt < 6){
+        setTimeout(()=>tryFind(attempt+1), 700);   // 부팅/오버라이드 적용 대기
+      } else {
+        setOn(true);
+        say('⚠️ 이 페이지에서 해당 문구를 찾지 못했습니다 — 직접 클릭해서 수정하세요.', 6000);
+      }
+    };
+    setTimeout(()=>tryFind(0), 800);
+  }
+  function tvCopyKey_(t){
+    let h = 5381;
+    for(let i=0;i<t.length;i++) h = ((h<<5)+h+t.charCodeAt(i))|0;
+    return 'c' + (h>>>0).toString(16);
+  }
   function setOn(v){
     on = v;
     btn.textContent = on ? '✅ 편집 끄기' : '✏️ 편집 켜기';

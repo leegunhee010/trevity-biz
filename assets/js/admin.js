@@ -388,17 +388,21 @@ function renderCopyText(){
   const ovrCnt = Object.keys(TV_COPY_OVR).length;
   document.getElementById('copy-ovr-cnt').textContent = ovrCnt ? `수정된 카피 ${ovrCnt}건` : '';
   box.innerHTML = list.slice(0, 400).map(e=>{
-    const cur = TV_COPY_OVR[e.k] !== undefined ? TV_COPY_OVR[e.k] : e.t;
-    const changed = TV_COPY_OVR[e.k] !== undefined;
-    const multi = e.t.includes('\n') || e.t.length > 60;
-    const field = multi
-      ? `<textarea class="srch" style="width:100%;min-height:56px" data-copy-key="${e.k}" onchange="saveCopyField(this)">${esc(cur)}</textarea>`
-      : `<input class="srch" style="width:100%" data-copy-key="${e.k}" value="${esc(cur)}" onchange="saveCopyField(this)">`;
+    const raw = TV_COPY_OVR[e.k];
+    const cur = raw !== undefined
+      ? String(raw).replace(/^HTML::/,'').replace(/<br\s*\/?>/g,'\n').replace(/<[^>]+>/g,'')
+      : e.t;
+    const changed = raw !== undefined;
+    const openPg = e.pg.includes(copyPage) ? copyPage : e.pg[0];
+    const field = `<textarea class="srch" style="width:100%;min-height:44px;font-size:14px;line-height:1.6" rows="${Math.max(1, cur.split('\n').length)}"
+        data-copy-key="${e.k}" onchange="saveCopyField(this)">${esc(cur)}</textarea>`;
     return `<div style="padding:10px 0;border-bottom:1px solid var(--adm-line)">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
         <span style="font-size:11px;color:${changed?'var(--tv-primary)':'var(--adm-sub)'};font-weight:700">${changed?'수정됨':'기본'}</span>
         <span style="font-size:11px;color:var(--adm-sub)">${e.pg.map(p=>COPY_PAGE_LABELS[p]||p).join(' · ')}</span>
-        ${changed?`<button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:11px;margin-left:auto" onclick="resetCopyField('${e.k}')">기본값으로</button>`:''}
+        <button class="btn btn-ghost btn-sm" style="padding:2px 10px;font-size:11px;margin-left:auto"
+          onclick="window.open('../${openPg}.html?edit=1&find=${e.k}','_blank')">📍 페이지에서 열기</button>
+        ${changed?`<button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:11px" onclick="resetCopyField('${e.k}')">기본값으로</button>`:''}
       </div>${field}</div>`;
   }).join('') || `<p class="note" style="margin:0">해당하는 카피가 없습니다.</p>`;
 }
@@ -428,7 +432,7 @@ function renderCopy(){
         <input class="srch grow" id="copy-srch" placeholder="전체 페이지에서 문구 검색…" value="${esc(copySearch)}"
           oninput="copySearch=this.value;renderCopyText()">
       </div>
-      <p class="note" style="margin-bottom:6px">같은 문구가 여러 곳에 쓰이면 한 번에 바뀝니다. 줄바꿈은 그대로 반영됩니다.</p>
+      <p class="note" style="margin-bottom:6px">💡 <b>📍 페이지에서 열기</b>를 누르면 실제 화면의 그 문구로 바로 이동해 보면서 수정할 수 있습니다(추천). 여기서 직접 고쳐도 되고, 같은 문구는 전 페이지에서 한 번에 바뀝니다.</p>
       <div id="copy-text-list" style="max-height:560px;overflow-y:auto"></div>
     </div>` + `
     <div class="card"><div class="card-head"><h3>포트폴리오 — 메인 페이지 롤 (index.html)</h3><span class="sp"></span>

@@ -20,7 +20,7 @@ PORT = 5723
 ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_DIR = os.path.join(ROOT, "images", "uploads")
 
-INJECT = '<script src="/assets/js/edit-mode.js?v=sb3"></script>'
+INJECT = '<script src="/assets/js/edit-mode.js?v=sb4"></script>'
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
