@@ -89,7 +89,7 @@ function applyCopy(){
    관리자가 ?edit=1 로 진입했을 때만 편집 오버레이를 불러온다 (일반 방문자는 로드 자체를 안 함) */
 if(/[?&]edit=1/.test(location.search) || sessionStorage.getItem('tvedit_sess') === '1'){
   const _es = document.createElement('script');
-  _es.src = './assets/js/edit-mode.js?v=sb2';
+  _es.src = './assets/js/edit-mode.js?v=sb3';
   document.head.appendChild(_es);
 }
 
