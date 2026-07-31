@@ -12,21 +12,39 @@
   let on = false;
   let editing = null;   // { el, origNorm, group: [{el, origOuter}] }
 
-  /* ---------- leaf 판정 (site-data.js 규칙과 동일) ---------- */
-  function leafText(el){
-    const parts = [];
-    for(const c of el.childNodes){
-      if(c.nodeType === 3) parts.push(c.nodeValue);
-      else if(c.nodeType === 1 && c.tagName === 'BR') parts.push('\n');
-      else return null;
+  /* ---------- 편집 대상 판정 ----------
+     순수 텍스트뿐 아니라 색상 강조 <span>·<b>·<br> 등 인라인 자식을 품은
+     제목/문장도 편집 가능 (강조 스팬 있는 히어로 제목이 클릭 안 되던 문제). */
+  const INLINE = { BR:1, B:1, STRONG:1, EM:1, I:1, U:1, SPAN:1, MARK:1, SMALL:1, A:1, SUB:1, SUP:1, TIME:1, DEL:1, INS:1 };
+  function allInline(el){
+    for(const c of el.children){
+      if(!INLINE[c.tagName]) return false;
+      if(!allInline(c)) return false;
     }
+    return true;
+  }
+  function tvText(el){
+    // 인라인 자식 포함 전체 텍스트를 <br>=\n 규칙으로 정규화
+    const parts = [];
+    (function walk(n){
+      for(const c of n.childNodes){
+        if(c.nodeType === 3) parts.push(c.nodeValue);
+        else if(c.nodeType === 1){
+          if(c.tagName === 'BR') parts.push('\n');
+          else walk(c);
+        }
+      }
+    })(el);
     const t = parts.join('').split('\n').map(ln=>ln.replace(/\s+/g,' ').trim()).join('\n').trim();
     return t || null;
   }
   function isTarget(el){
     if(!el || !el.matches || !el.matches(TAGS)) return false;
     if(el.closest('#tvedit-bar')) return false;
-    const t = leafText(el);
+    if(el.querySelector && el.querySelector('svg,img,video,iframe,input,select,textarea,button')) return false;
+    if(!allInline(el)) return false;
+    // 부모가 이미 편집 대상이면 부모(줄 전체)를 잡는다 → 중첩 편집 방지
+    const t = tvText(el);
     return !!t && t.length >= 1 && t.length <= 600;
   }
 
@@ -200,15 +218,18 @@
   }
   function start(el){
     clearHl();
-    const origNorm = leafText(el);
-    // 같은 문구를 가진 leaf 전부 (숨겨진 모바일/PC 쌍둥이 포함) — 편집 전에 원본 캡처
+    const origNorm = tvText(el);
+    const origInner = el.innerHTML;
+    // 같은 문구+같은 마크업의 쌍둥이(모바일/PC 중복)만 함께 수정 — 편집 전에 원본 캡처
     const group = [];
     document.body.querySelectorAll(TAGS).forEach(x => {
-      if(leafText(x) === origNorm) group.push({ el: x, origOuter: cleanOuter(x) });
+      if(x === el || (isTarget(x) && tvText(x) === origNorm && x.innerHTML === origInner))
+        group.push({ el: x, origOuter: cleanOuter(x) });
     });
+    if(!group.some(g => g.el === el)) group.push({ el, origOuter: cleanOuter(el) });
     editing = { el, origNorm, group };
     el.classList.add('tvedit-live');
-    el.setAttribute('contenteditable', 'plaintext-only');
+    el.setAttribute('contenteditable', 'true');
     el.focus();
   }
   async function finish(save){
@@ -216,7 +237,7 @@
     const el = ed.el;
     el.removeAttribute('contenteditable');
     el.classList.remove('tvedit-live');
-    const newNorm = leafText(el);
+    const newNorm = tvText(el);
     if(!save || newNorm === ed.origNorm || newNorm === null){
       // 원복
       ed.group.forEach(g => { if(g.el === el){ const tmp = document.createElement('div'); tmp.innerHTML = g.origOuter; el.replaceWith(tmp.firstChild); } });
