@@ -130,7 +130,16 @@ function renderNav(){
   const counts = { inq:newCnt||'', board:TV_BLOG_POSTS.length, copy:'', dash:'', seo:'', settings:'' };
   document.getElementById('sb-nav').innerHTML = NAV.map(n=>navBtn(n,counts)).join('')
     + `<div class="grp">도구</div>`
-    + `<button onclick="window.open(EDIT_ORIGIN+'/?edit=1','_blank')"><span>✏️ 화면 편집 (사이트 보면서 수정)</span></button>`;
+    + `<button onclick="openEditMode()"><span>✏️ 화면 편집 (사이트 보면서 수정)</span></button>`;
+}
+/* 편집 서버가 꺼져 있으면 켜는 법을 안내 (그냥 열면 연결 오류 페이지만 떠서 헷갈림) */
+async function openEditMode(){
+  try{
+    await fetch(EDIT_ORIGIN + '/api/settings', { signal: AbortSignal.timeout(1500) });
+    window.open(EDIT_ORIGIN + '/?edit=1', '_blank');
+  }catch(e){
+    alert('편집 서버가 꺼져 있습니다.\n\n사이트 폴더의 [편집서버-시작.bat] 을 더블클릭해 켠 다음\n다시 이 버튼을 눌러주세요.');
+  }
 }
 
 /* ---------- 게시판 · SEO (편집 서버 UI 내장) ---------- */
