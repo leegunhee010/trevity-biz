@@ -24,7 +24,7 @@
      GitHub API로 HTML 파일에 바로 커밋한다 → 깜빡임 없음, AI가 새 카피를 읽음. */
   const GH = { owner: 'leegunhee010', repo: 'trevity-biz', branch: 'main' };
   const GH_PAGES = ['index','vietnam-tiktok','tourist-vn','tourist-cn','local-vn','stay',
-    'experience','export','famtour','blog','help','agency','about','inquiry','coming-soon',
+    'blog','help','agency','inquiry',
     'blog-post','blog-market','blog-midtier','blog-diy','blog-hantown'];
   const ghToken = () => localStorage.getItem('tv_gh_token') || '';
   function b64decodeUtf8(b64){

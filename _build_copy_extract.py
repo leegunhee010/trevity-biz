@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup, NavigableString, Tag
 import io, re, json
 
 PAGES = ['index','vietnam-tiktok','local-vn','stay','tourist-vn','tourist-cn',
-         'experience','export','famtour','help','agency','about','inquiry','blog','coming-soon']
+         'help','agency','inquiry','blog']
 SKIP_TAGS = {'script','style','title','noscript','svg','option','time'}
 TEXT_TAGS = {'h1','h2','h3','h4','h5','h6','p','span','a','b','strong','em','small','li','td','th','button','div','label','summary','figcaption','blockquote','i','u'}
 

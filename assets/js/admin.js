@@ -366,8 +366,7 @@ let copySearch = '';
 
 const COPY_PAGE_LABELS = {
   'index':'메인', 'vietnam-tiktok':'수출 랜딩', 'local-vn':'베트남 현지', 'stay':'숙박',
-  'tourist-vn':'베트남 관광객', 'tourist-cn':'중국 관광객',  'experience':'체험단', 'export':'해외수출', 'famtour':'팸투어', 'help':'고객센터',
-  'agency':'공식대행사', 'about':'회사소개', 'inquiry':'문의', 'blog':'블로그', 'coming-soon':'준비중',
+  'tourist-vn':'베트남 관광객', 'tourist-cn':'중국 관광객',  'help':'고객센터', 'agency':'공식대행사', 'inquiry':'문의', 'blog':'블로그',
 };
 
 function copyEntries(){
