@@ -37,16 +37,60 @@ function tvLeafText(el){
   const t = parts.join('').split('\n').map(ln=>ln.replace(/\s+/g,' ').trim()).join('\n').trim();
   return t || null;
 }
+/* 강조 스팬(<em>·<span> 등 인라인)만 품은 요소도 카피 대상 — 편집기와 동일 규칙 */
+const TV_INLINE = { BR:1, B:1, STRONG:1, EM:1, I:1, U:1, SPAN:1, MARK:1, SMALL:1, A:1, SUB:1, SUP:1, TIME:1, DEL:1, INS:1 };
+function tvAllInline(el){
+  for(const c of el.children){
+    if(!TV_INLINE[c.tagName]) return false;
+    if(!tvAllInline(c)) return false;
+  }
+  return true;
+}
+function tvRichText(el){
+  const parts = [];
+  (function walk(n){
+    for(const c of n.childNodes){
+      if(c.nodeType === 3) parts.push(c.nodeValue);
+      else if(c.nodeType === 1){
+        if(c.tagName === 'BR') parts.push('\n');
+        else walk(c);
+      }
+    }
+  })(el);
+  const t = parts.join('').split('\n').map(ln=>ln.replace(/\s+/g,' ').trim()).join('\n').trim();
+  return t || null;
+}
 function applyCopy(){
+  if(/[?&]nooverride=1/.test(location.search)) return;   // 굽기 작업용: 원본 그대로 보기
   if(typeof TV_COPY_OVR === 'undefined' || !Object.keys(TV_COPY_OVR).length) return;
   document.body.querySelectorAll(TV_COPY_TAGS).forEach(el=>{
     if(el.closest('script,style')) return;
-    const t = tvLeafText(el);
-    if(!t || t.length < 2 || t.length > 600) return;
-    const v = TV_COPY_OVR[tvCopyKey(t)];
+    if(el.querySelector && el.querySelector('svg,img,video,iframe,input,select,textarea,button')) return;
+    if(!tvAllInline(el)) return;
+    const t = tvRichText(el);
+    if(!t || t.length < 1 || t.length > 600) return;
+    const k = tvCopyKey(t);
+    const v = TV_COPY_OVR[k];
     if(v === undefined || v === null || v === t) return;
-    el.innerHTML = esc(v).replace(/\n/g,'<br>');
+    el.dataset.tvck = k;   // 편집기가 재편집 시 원래 키를 알 수 있게
+    if(String(v).slice(0,6) === 'HTML::') el.innerHTML = String(v).slice(6);
+    else el.innerHTML = esc(v).replace(/\n/g,'<br>');
   });
+  /* 이미지 오버라이드: 'img:<원본src>' → 새 URL */
+  document.body.querySelectorAll('img').forEach(img=>{
+    const src = img.getAttribute('src');
+    if(!src) return;
+    const v = TV_COPY_OVR['img:' + src] || TV_COPY_OVR['img:' + src.replace(/^\.\//, '')];
+    if(v){ img.dataset.tvimgk = 'img:' + src; img.src = v; }
+  });
+}
+
+/* ---------- 화면 편집 로더 ----------
+   관리자가 ?edit=1 로 진입했을 때만 편집 오버레이를 불러온다 (일반 방문자는 로드 자체를 안 함) */
+if(/[?&]edit=1/.test(location.search) || sessionStorage.getItem('tvedit_sess') === '1'){
+  const _es = document.createElement('script');
+  _es.src = './assets/js/edit-mode.js?v=sb2';
+  document.head.appendChild(_es);
 }
 
 /* ---------- 블로그 목록 (blog.html) ---------- */

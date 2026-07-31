@@ -112,10 +112,14 @@ async function boot(){
 
 /* ---------- 사이드바 · 탭 ---------- */
 const TABS = ['dash','inq','blog','board','seo','copy','settings'];
+/* 로컬(편집 서버 사용 가능)에서는 정적 굽기 게시판, 라이브에서는 수파베이스 블로그 편집기 */
+const IS_LOCAL_TOOLS = ['localhost','127.0.0.1'].indexOf(location.hostname) >= 0;
 const NAV = [
   { id:'dash',     label:'대시보드', title:'대시보드',        desc:'문의·콘텐츠 현황 한눈에 보기' },
   { id:'inq',      label:'문의함',   title:'문의함',          desc:'inquiry.html로 들어온 문의' },
-  { id:'board',    label:'게시판',   title:'게시판 관리',      desc:'HTML 본문 → 정적 페이지 굽기' },
+  IS_LOCAL_TOOLS
+    ? { id:'board', label:'게시판',   title:'게시판 관리',      desc:'HTML 본문 → 정적 페이지 굽기' }
+    : { id:'blog',  label:'블로그',   title:'블로그 관리',      desc:'글 작성·수정 — 저장 즉시 사이트 반영' },
   { id:'copy',     label:'카피',     title:'포트폴리오 · 패키지', desc:'이미지 롤과 vietnam-tiktok 패키지 가격' },
   { id:'seo',      label:'SEO',     title:'SEO 관리',        desc:'메타·구조화데이터·sitemap·플로팅버튼·메일' },
   { id:'settings', label:'설정',     title:'설정',            desc:'관리자 비밀번호와 연결 상태' },
@@ -132,8 +136,12 @@ function renderNav(){
     + `<div class="grp">도구</div>`
     + `<button onclick="openEditMode()"><span>✏️ 화면 편집 (사이트 보면서 수정)</span></button>`;
 }
-/* 편집 서버가 꺼져 있으면 켜는 법을 안내 (그냥 열면 연결 오류 페이지만 떠서 헷갈림) */
+/* 화면 편집 열기 — 라이브에서는 같은 사이트를 ?edit=1 로, 로컬에서는 편집 서버로 */
 async function openEditMode(){
+  if(!IS_LOCAL_TOOLS){
+    window.open(new URL('../?edit=1', location.href).href, '_blank');
+    return;
+  }
   try{
     await fetch(EDIT_ORIGIN + '/api/settings', { signal: AbortSignal.timeout(1500) });
     window.open(EDIT_ORIGIN + '/?edit=1', '_blank');
@@ -144,6 +152,7 @@ async function openEditMode(){
 
 /* ---------- 게시판 · SEO (편집 서버 UI 내장) ---------- */
 function renderBoard(){
+  if(!IS_LOCAL_TOOLS) return;   // 라이브에서는 블로그 탭(수파베이스)이 대신한다
   const el = document.getElementById('tab-board');
   if(el.dataset.loaded) return;
   el.dataset.loaded = '1';
@@ -155,6 +164,13 @@ function renderSeo(){
   const el = document.getElementById('tab-seo');
   if(el.dataset.loaded) return;
   el.dataset.loaded = '1';
+  if(!IS_LOCAL_TOOLS){
+    el.innerHTML = `<div class="card"><h3>SEO 관리는 로컬 도구입니다</h3>
+      <p class="note">메타·sitemap·구조화데이터는 HTML 파일에 직접 굽는 작업이라 내 컴퓨터에서 실행합니다.<br>
+      사이트 폴더의 <b>편집서버-시작.bat</b> 을 켠 뒤 <b>http://localhost:5723/admin/</b> 의 SEO 탭에서 편집하고,
+      끝나면 push(또는 클로드에게 "올려줘")하면 라이브에 반영됩니다.</p></div>`;
+    return;
+  }
   el.innerHTML = `<p class="tool-note">메타·sitemap·robots·rss·구조화데이터·플로팅 버튼·문의 메일 설정 — 저장 즉시 HTML에 구워집니다.</p>
     <iframe class="tool-frame" src="${EDIT_ORIGIN}/seo.html"></iframe>`;
 }

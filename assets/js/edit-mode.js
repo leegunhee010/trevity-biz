@@ -5,8 +5,19 @@
   /* 편집 UI는 관리자가 의도적으로 연 세션에서만 노출:
      ?edit=1 로 진입하면 세션 내내 유지, 편집 끄기+ESC 로 세션 종료.
      (일반 방문 화면에는 아무것도 안 보임) */
+  if(window.__tvedit_loaded) return;   // 서버 주입 + 로더 중복 방지
+  window.__tvedit_loaded = 1;
   if(/[?&]edit=1/.test(location.search)) sessionStorage.setItem('tvedit_sess', '1');
   if(sessionStorage.getItem('tvedit_sess') !== '1') return;
+
+  /* 저장 방식:
+     - 편집 서버(localhost:5723)로 열었을 때 → HTML 파일에 직접 굽기 (정적)
+     - 그 외(라이브·:5695 등, 수파베이스 연결 시) → site_copy 오버라이드 저장 → 전 페이지 즉시 반영
+       (관리자 로그인 필요 — /admin/ 에서 로그인한 세션이 공유됨) */
+  const BAKE_MODE = location.hostname === 'localhost' && location.port === '5723';
+  const SB_OK = () => typeof TV_BACKEND !== 'undefined' && TV_BACKEND === 'supabase'
+                   && typeof TvData !== 'undefined';
+  const sbAdmin = () => SB_OK() && TvData.admin;
 
   const TAGS = 'h1,h2,h3,h4,h5,h6,p,span,a,b,strong,em,small,li,td,th,button,div,label,summary,figcaption,blockquote,i,u';
   let on = false;
@@ -138,6 +149,22 @@
     inp.click();
   }
   function replaceMedia(t){
+    /* 수파베이스 모드: Storage 업로드 → 'img:원본src' 오버라이드 저장 (모든 페이지 즉시 적용) */
+    if(!BAKE_MODE){
+      if(!sbAdmin()){ say('⚠️ 이미지 교체는 관리자 로그인이 필요합니다 — /admin/ 에서 로그인하세요.', 6000); return; }
+      if(t.kind !== 'img'){ say('영상·배경 교체는 로컬 화면 편집(편집서버-시작.bat)에서 지원됩니다.', 5000); return; }
+      pickFile('image/*', f => {
+        say('업로드 중…', 12000);
+        TvImg.save(f).then(async r => {
+          const origSrc = (t.el.dataset.tvimgk || ('img:' + t.el.getAttribute('src'))).replace(/^img:/, '');
+          await Admin.setCopy('img:' + origSrc, r.ref);
+          t.el.src = r.ref;
+          t.el.dataset.tvimgk = 'img:' + origSrc;
+          say('✅ 이미지 교체됨 — 모든 페이지 즉시 적용 (정적 반영은 "구워줘")');
+        }).catch(err => say('⚠️ 업로드 실패: ' + (err.message||err), 6000));
+      });
+      return;
+    }
     if(t.kind === 'img'){
       pickFile('image/*', f => sendReplace(t.src, f, ns => { t.el.src = ns; }));
       return;
@@ -218,8 +245,14 @@
   }
   function start(el){
     clearHl();
+    if(!BAKE_MODE && !sbAdmin()){
+      say('⚠️ 저장하려면 관리자 로그인이 필요합니다 — /admin/ 에서 로그인 후 다시 열어주세요.', 6000);
+      return;
+    }
     const origNorm = tvText(el);
     const origInner = el.innerHTML;
+    // 재편집이면 applyCopy가 태그해둔 원래 키를 사용 (원문이 이미 오버라이드된 상태)
+    const copyKey = el.dataset.tvck || tvCopyKey(origNorm);
     // 같은 문구+같은 마크업의 쌍둥이(모바일/PC 중복)만 함께 수정 — 편집 전에 원본 캡처
     const group = [];
     document.body.querySelectorAll(TAGS).forEach(x => {
@@ -227,7 +260,7 @@
         group.push({ el: x, origOuter: cleanOuter(x) });
     });
     if(!group.some(g => g.el === el)) group.push({ el, origOuter: cleanOuter(el) });
-    editing = { el, origNorm, group };
+    editing = { el, origNorm, copyKey, group };
     el.classList.add('tvedit-live');
     el.setAttribute('contenteditable', 'true');
     el.focus();
@@ -252,6 +285,22 @@
       reps.push({ old: g.origOuter, new: cleanOuter(g.el) });
     });
     say('저장 중…', 8000);
+
+    /* 수파베이스 모드: 오버라이드로 저장 → 이 문구가 나오는 모든 페이지에 즉시 적용 */
+    if(!BAKE_MODE){
+      try{
+        const tmp = document.createElement('div'); tmp.innerHTML = newHTML;
+        // 편집기 잔여 속성 정리 후 HTML 그대로 저장 (강조 스팬 유지)
+        tmp.querySelectorAll('[contenteditable]').forEach(x=>x.removeAttribute('contenteditable'));
+        await Admin.setCopy(ed.copyKey, 'HTML::' + tmp.innerHTML);
+        ed.group.forEach(g => { g.el.dataset.tvck = ed.copyKey; });
+        say('✅ 저장됨 — 모든 페이지에 즉시 적용 (정적 반영은 나중에 "구워줘")');
+      }catch(err){
+        say('⚠️ 저장 실패: ' + (err.message||err) + ' — 관리자 로그인 상태를 확인하세요.', 6000);
+      }
+      return;
+    }
+
     try{
       const page = location.pathname.replace(/^\//,'') || 'index.html';
       const r = await fetch('/api/bake', {
