@@ -140,176 +140,121 @@ html{scroll-behavior:smooth}
 <style>
 .tvhc{background:#fff;word-break:keep-all;color:#1f1f1f}
 .tvhc-w{max-width:1084px;margin:0 auto;padding:0 20px}
-.tvhc-label{display:inline-block;font-size:14px;font-weight:800;letter-spacing:2.5px;color:#fa6781;margin:0 0 18px}
-.tvhc-h1{font-size:44px;font-weight:800;line-height:1.35;letter-spacing:-0.9px;margin:0}
-.tvhc-h2{font-size:34px;font-weight:800;line-height:1.45;letter-spacing:-0.68px;margin:0}
-.tvhc-h3{font-size:22px;font-weight:700;line-height:1.5;letter-spacing:-0.44px;margin:0}
-.tvhc-sub{font-size:16px;line-height:1.8;letter-spacing:-0.32px;color:#595959;margin:18px 0 0;max-width:620px}
-.tvhc-sec{padding:96px 0 0}
-.tvhc-sec:last-child{padding-bottom:110px}
-.tvhc-eyebrow{font-size:13px;font-weight:800;letter-spacing:1.6px;color:#8c8c8c;margin:0 0 14px}
+.tvhc-label{display:block;text-align:center;font-size:14px;font-weight:800;letter-spacing:2.5px;color:#fa6781;margin:0 0 16px}
+.tvhc-h1{font-size:46px;font-weight:800;line-height:1.4;letter-spacing:-0.92px;margin:0;text-align:center}
+.tvhc-h2{font-size:36px;font-weight:800;line-height:1.45;letter-spacing:-0.72px;margin:0;text-align:center}
+.tvhc-sub{font-size:16.5px;line-height:1.85;letter-spacing:-0.33px;color:#595959;margin:20px auto 0;max-width:660px;text-align:center}
 
-/* 히어로 + 검색 : 밑줄형 (프레임리스) */
-.tvhc-hero{padding:96px 0 0}
-.tvhc-search{position:relative;max-width:560px;margin:38px 0 0;border-bottom:2px solid #1f1f1f}
-.tvhc-search input{width:100%;border:0;outline:0;background:transparent;font-size:20px;font-weight:600;
-  letter-spacing:-0.4px;color:#1f1f1f;padding:0 34px 14px 0;font-family:inherit}
-.tvhc-search input::placeholder{color:#b0b0b0;font-weight:500}
-.tvhc-search svg{position:absolute;right:2px;bottom:14px;width:22px;height:22px;stroke:#1f1f1f;
-  stroke-width:1.8;fill:none;pointer-events:none}
-.tvhc-res{font-size:15px;font-weight:600;color:#fa6781;margin:16px 0 0;min-height:22px}
+/* 히어로 — 다른 서비스 페이지와 동일한 핑크 라디얼 */
+.tvhc-hero{background:radial-gradient(120% 90% at 50% 0%,#ffeef2 0%,#fff7f9 45%,#ffffff 100%);padding:157px 0 88px;text-align:center}
+.tvhc-cta{display:inline-block;margin:36px auto 0;background:#fa6781;color:#fff;text-decoration:none;
+  font-size:16px;font-weight:800;letter-spacing:-0.32px;padding:17px 40px;border-radius:10px;transition:opacity .15s}
+.tvhc-cta:hover{opacity:.85}
 
-/* 주제 탭 : 텍스트 + 활성 밑줄, 카드 아님 */
-.tvhc-tabs{display:flex;gap:30px;margin:44px 0 0;border-bottom:1px solid #e5e5e5;
-  overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
-.tvhc-tabs::-webkit-scrollbar{display:none}
-.tvhc-tab{flex:none;background:none;border:0;padding:0 0 15px;cursor:pointer;font-family:inherit;
-  font-size:17px;font-weight:700;letter-spacing:-0.34px;color:#a6a6a6;position:relative;white-space:nowrap;
-  transition:color .2s}
-.tvhc-tab:hover{color:#595959}
-.tvhc-tab.on{color:#1f1f1f}
-.tvhc-tab.on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:#fa6781}
-.tvhc-tab i{display:block;font-style:normal;font-size:12px;font-weight:600;color:#b0b0b0;
-  letter-spacing:0;margin-top:5px}
+/* 섹션 리듬 — 흰색/연핑크 교차 */
+.tvhc-sec{padding:96px 0}
+#contact.tvhc-sec{background:linear-gradient(180deg,#ffffff 0%,#fff0f3 100%);text-align:center}
 
-/* 주제 패널 */
-.tvhc-panel{padding:52px 0 0}
-.tvhc-mkt{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:#fa6781;
-  letter-spacing:-0.26px;margin:0 0 16px}
-.tvhc-mkt::before{content:'';width:6px;height:6px;border-radius:50%;background:#fa6781}
-.tvhc-lead{font-size:20px;font-weight:600;line-height:1.75;letter-spacing:-0.4px;color:#1f1f1f;
-  margin:0;max-width:760px}
-.tvhc-fit{font-size:16px;line-height:1.8;letter-spacing:-0.32px;color:#595959;margin:22px 0 0}
-.tvhc-fit b{color:#1f1f1f;font-weight:700}
-
-/* 헤어라인 위 가로 4칸 (지도 v3 승인 패턴) */
-.tvhc-facts{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:44px 0 0;
-  border-top:1px solid #1f1f1f}
-.tvhc-fact{padding:22px 22px 0 0}
-.tvhc-fact dt{font-size:13px;font-weight:800;letter-spacing:0.4px;color:#8c8c8c;margin:0 0 10px}
-.tvhc-fact dd{font-size:16px;font-weight:700;line-height:1.65;letter-spacing:-0.32px;color:#1f1f1f;margin:0}
+/* 카드 그리드 (상품·혜택) */
+.tvhc-facts{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:44px 0 0}
+.tvhc-fact{background:#fff;border:1px solid #f0f0f2;border-radius:16px;padding:28px 24px;
+  box-shadow:0 10px 28px rgba(31,31,35,.05)}
+.tvhc-fact dt{font-size:17px;font-weight:800;letter-spacing:-0.34px;color:#1f1f1f;margin:0 0 10px}
+.tvhc-fact dd{font-size:15px;font-weight:500;line-height:1.7;letter-spacing:-0.3px;color:#595959;margin:0}
 .tvhc-fact dd.q{color:#a6a6a6;font-weight:600}
 
-/* 아코디언 */
-.tvhc-acc{margin:46px 0 0;border-top:1px solid #e5e5e5}
-.tvhc-item{border-bottom:1px solid #e5e5e5}
-.tvhc-item>summary{list-style:none;cursor:pointer;padding:22px 40px 22px 0;position:relative;
-  font-size:17px;font-weight:700;line-height:1.6;letter-spacing:-0.34px;color:#1f1f1f}
-.tvhc-item>summary::-webkit-details-marker{display:none}
-.tvhc-item>summary::after{content:'';position:absolute;right:6px;top:31px;width:9px;height:9px;
-  border-right:2px solid #a6a6a6;border-bottom:2px solid #a6a6a6;transform:rotate(45deg);
-  transition:transform .2s}
-.tvhc-item[open]>summary{color:#fa6781}
-.tvhc-item[open]>summary::after{transform:rotate(-135deg);border-color:#fa6781}
-.tvhc-item>div{font-size:16px;line-height:1.85;letter-spacing:-0.32px;color:#595959;
-  padding:0 40px 26px 0;margin:-4px 0 0}
-.tvhc-item>div b{color:#1f1f1f;font-weight:700}
-
-.tvhc-more{display:inline-flex;align-items:center;gap:8px;margin:34px 0 0;font-size:16px;
-  font-weight:700;letter-spacing:-0.32px;color:#fa6781;text-decoration:none;
-  border-bottom:1px solid #fa6781;padding-bottom:3px}
-.tvhc-more svg{width:15px;height:15px;stroke:#fa6781;stroke-width:2;fill:none}
-
-/* 이용 흐름 : 헤어라인 위 가로 4칸 */
-.tvhc-steps{display:grid;grid-template-columns:repeat(4,1fr);margin:42px 0 0;border-top:1px solid #1f1f1f}
-.tvhc-step{padding:22px 24px 0 0}
-.tvhc-step em{display:block;font-style:normal;font-size:13px;font-weight:800;color:#fa6781;
-  letter-spacing:1px;margin:0 0 12px}
+/* 이용 흐름 — STEP 카드 4칸 */
+.tvhc-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:44px 0 0}
+.tvhc-step{background:#fff;border:1px solid #f0f0f2;border-radius:16px;padding:28px 24px;
+  box-shadow:0 10px 28px rgba(31,31,35,.05)}
+.tvhc-step em{display:block;font-style:normal;font-size:12px;font-weight:800;color:#fa6781;letter-spacing:1.5px;margin:0 0 12px}
 .tvhc-step strong{display:block;font-size:18px;font-weight:800;letter-spacing:-0.36px;margin:0 0 10px}
 .tvhc-step span{display:block;font-size:15px;line-height:1.75;letter-spacing:-0.3px;color:#595959}
 
-/* 상담 확정 항목 : 2열 리스트 */
-.tvhc-consult{display:grid;grid-template-columns:1fr 1fr;gap:0 48px;margin:38px 0 0}
-.tvhc-crow{border-top:1px solid #e5e5e5;padding:20px 0}
+/* 상담 확정 항목 — 카드 2열 */
+.tvhc-consult{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:40px 0 0}
+.tvhc-crow{background:#fff;border:1px solid #f0f0f2;border-radius:14px;padding:24px 26px;
+  box-shadow:0 10px 28px rgba(31,31,35,.05)}
 .tvhc-crow strong{display:block;font-size:16px;font-weight:800;letter-spacing:-0.32px;margin:0 0 7px}
 .tvhc-crow span{display:block;font-size:15px;line-height:1.7;letter-spacing:-0.3px;color:#8c8c8c}
 
-/* 용어 사전 */
-.tvhc-gl{margin:38px 0 0}
-.tvhc-glrow{display:grid;grid-template-columns:190px 1fr;gap:0 32px;border-top:1px solid #e5e5e5;
-  padding:20px 0}
-.tvhc-glrow dt{font-size:17px;font-weight:800;letter-spacing:-0.34px;color:#1f1f1f;margin:0}
-.tvhc-glrow dd{font-size:16px;line-height:1.8;letter-spacing:-0.32px;color:#595959;margin:0}
+/* FAQ — 메인 페이지 tvfaq 아코디언과 동일 룩 */
+.tvhc-acc{max-width:840px;margin:40px auto 0}
+.tvhc-item{border:1px solid #f0f0f2;border-radius:14px;background:#fafafa;margin-bottom:12px;overflow:hidden}
+.tvhc-item>summary{list-style:none;cursor:pointer;padding:22px 48px 22px 24px;position:relative;
+  font-size:17px;font-weight:700;line-height:1.6;letter-spacing:-0.34px;color:#1f1f1f}
+.tvhc-item>summary::-webkit-details-marker{display:none}
+.tvhc-item>summary::before{content:'Q.';color:#fa6781;font-weight:800;margin-right:9px}
+.tvhc-item>summary::after{content:'';position:absolute;right:24px;top:30px;width:9px;height:9px;
+  border-right:2px solid #a6a6a6;border-bottom:2px solid #a6a6a6;transform:rotate(45deg);transition:transform .2s}
+.tvhc-item[open]{background:#fff5f7;border-color:#ffd3dc}
+.tvhc-item[open]>summary::after{transform:rotate(-135deg);border-color:#fa6781}
+.tvhc-item>div{font-size:15.5px;line-height:1.85;letter-spacing:-0.31px;color:#595959;padding:0 24px 24px 47px;margin:-4px 0 0}
+.tvhc-item>div b{color:#1f1f1f;font-weight:700}
 
-/* 문의 채널 : 헤어라인 위 가로 3칸 */
-.tvhc-ch{display:grid;grid-template-columns:repeat(3,1fr);margin:42px 0 0;border-top:1px solid #1f1f1f}
-.tvhc-chi{padding:24px 24px 0 0}
+.tvhc-more{display:inline-flex;align-items:center;gap:6px;margin:16px 0 0;font-size:14px;
+  font-weight:700;letter-spacing:-0.28px;color:#fa6781;text-decoration:none}
+.tvhc-more svg{width:14px;height:14px;stroke:#fa6781;stroke-width:2;fill:none}
+
+/* 문의 채널 — 카드 3칸 */
+.tvhc-ch{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:44px 0 0}
+.tvhc-chi{background:#fff;border:1px solid #f0f0f2;border-radius:16px;padding:28px 22px;text-align:center;
+  box-shadow:0 10px 28px rgba(31,31,35,.05)}
 .tvhc-chi dt{font-size:13px;font-weight:800;letter-spacing:0.4px;color:#8c8c8c;margin:0 0 11px}
-.tvhc-chi dd{font-size:20px;font-weight:800;letter-spacing:-0.4px;color:#1f1f1f;margin:0}
-.tvhc-chi dd small{display:block;font-size:15px;font-weight:600;color:#8c8c8c;margin-top:8px;
-  letter-spacing:-0.3px}
-.tvhc-cta{display:inline-block;margin:40px 0 0;background:#fa6781;color:#fff;text-decoration:none;
-  font-size:17px;font-weight:800;letter-spacing:-0.34px;padding:18px 42px;border-radius:100px}
+.tvhc-chi dd{font-size:19px;font-weight:800;letter-spacing:-0.38px;color:#1f1f1f;margin:0}
+.tvhc-chi dd small{display:block;font-size:14px;font-weight:600;color:#8c8c8c;margin-top:8px;letter-spacing:-0.28px}
 
 @media (max-width:1023px){
   .tvhc-facts,.tvhc-steps{grid-template-columns:1fr 1fr}
-  .tvhc-fact,.tvhc-step{padding-bottom:22px}
 }
 @media (max-width:767px){
-  .tvhc-sec{padding-top:62px}
-  .tvhc-sec:last-child{padding-bottom:68px}
-  .tvhc-hero{padding-top:52px}
+  .tvhc-sec{padding:62px 0}
+  .tvhc-hero{padding:113px 0 56px}
   .tvhc-h1{font-size:30px;letter-spacing:-0.6px}
   .tvhc-h2{font-size:25px}
-  .tvhc-h3{font-size:19px}
-  .tvhc-search input{font-size:17px}
-  .tvhc-tabs{gap:22px;margin-top:34px}
-  .tvhc-tab{font-size:16px}
-  .tvhc-panel{padding-top:38px}
-  .tvhc-lead{font-size:17px}
-  .tvhc-facts,.tvhc-steps,.tvhc-ch{grid-template-columns:1fr}
-  .tvhc-fact,.tvhc-step,.tvhc-chi{padding:20px 0 0}
-  .tvhc-consult{grid-template-columns:1fr;gap:0}
-  .tvhc-glrow{grid-template-columns:1fr;gap:8px}
-  .tvhc-item>summary{font-size:16px;padding-right:32px}
-  .tvhc-item>summary::after{top:29px}
-  .tvhc-cta{display:block;text-align:center;padding:17px 0}
+  .tvhc-facts,.tvhc-steps,.tvhc-ch{grid-template-columns:1fr;gap:12px}
+  .tvhc-consult{grid-template-columns:1fr;gap:12px}
+  .tvhc-item>summary{font-size:16px;padding:20px 40px 20px 18px}
+  .tvhc-item>summary::after{right:18px;top:27px}
+  .tvhc-item>div{padding:0 18px 20px 18px}
+  .tvhc-cta{display:block;text-align:center;padding:16px 0;margin-top:30px}
 }
 </style>
 <section class="tvhc-hero"><div class="tvhc-w">
 <span class="tvhc-label">OFFICIAL AGENCY</span>
-<h1 class="tvhc-h1">트래비티 공식대행사를<br/>모집합니다</h1>
-<p class="tvhc-sub">체험단과 인플루언서 마케팅을 고객사에 제안하고 계신다면, 해외 실행은 트래비티가 맡습니다. 광고대행사·마케팅 에이전시와 함께 판매합니다.</p>
+<h1 class="tvhc-h1">트래비티 공식대행사 모집</h1>
+<p class="tvhc-sub">체험단과 인플루언서 마케팅을 고객사에 제안하고 계신다면,<br>해외 실행은 트래비티가 맡습니다. 광고대행사·마케팅 에이전시와 함께 판매합니다.</p>
 <a class="tvhc-cta" href="./inquiry.html">제휴 문의하기</a>
 </div></section>
 <section class="tvhc-sec" id="products" style="scroll-margin-top:76px"><div class="tvhc-w">
 <span class="tvhc-label">PRODUCTS</span>
-<h2 class="tvhc-h2">함께 판매하는 상품</h2>
+<h2 class="tvhc-h2">서비스 항목</h2>
 <dl class="tvhc-facts">
 <div class="tvhc-fact"><dt>한국제품 해외수출</dt><dd style="font-weight:600;font-size:15px;line-height:1.7;color:#595959">베트남 현지 인플루언서를 부킹해 제품을 알립니다</dd><a class="tvhc-more" style="margin-top:16px;font-size:14px" href="./vietnam-tiktok.html">자세히<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
 <div class="tvhc-fact"><dt>외국인 관광객 유치</dt><dd style="font-weight:600;font-size:15px;line-height:1.7;color:#595959">방한 베트남인·중국인이 매장을 체험하고 현지 SNS에 남깁니다</dd><a class="tvhc-more" style="margin-top:16px;font-size:14px" href="./tourist-vn.html">자세히<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
 <div class="tvhc-fact"><dt>해외 현지 매장 마케팅</dt><dd style="font-weight:600;font-size:15px;line-height:1.7;color:#595959">베트남에 있는 매장의 로컬 손님을 늘립니다</dd><a class="tvhc-more" style="margin-top:16px;font-size:14px" href="./local-vn.html">자세히<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
 <div class="tvhc-fact"><dt>숙박 체험단</dt><dd style="font-weight:600;font-size:15px;line-height:1.7;color:#595959">호텔·펜션의 빈 객실을 후기로 바꿉니다</dd><a class="tvhc-more" style="margin-top:16px;font-size:14px" href="./stay.html">자세히<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
 </dl></div></section>
-<section class="tvhc-sec"><div class="tvhc-w">
+<section class="tvhc-sec" style="background:#fff5f7"><div class="tvhc-w">
 <span class="tvhc-label">WHAT YOU GET</span>
-<h2 class="tvhc-h2">대행사가 받는 것</h2>
+<h2 class="tvhc-h2">지원항목</h2>
 <div class="tvhc-consult">
-<div class="tvhc-crow"><strong>상품 교육</strong><span style="color:#595959">상품 구성과 단가, 진행 절차, 실제 사례를 전달드립니다. 고객사에 바로 제안하실 수 있는 수준까지 안내합니다.</span></div>
+<div class="tvhc-crow"><strong>상품 교육</strong><span style="color:#595959">상품 구성과 단가, 진행 절차, 실제 사례를 전달드립니다.<br>고객사에 바로 제안하실 수 있는 수준까지 안내합니다.</span></div>
 <div class="tvhc-crow"><strong>정산 조건 안내</strong><span style="color:#595959">제휴 상담에서 정산 조건을 확정해 드립니다.</span></div>
-<div class="tvhc-crow"><strong>현지 실행 전담</strong><span style="color:#595959">섭외부터 가이드라인, 촬영, 검수까지 트래비티가 직접 진행합니다. 서울·대련·호치민·대구 4개 거점의 현지 마케터가 중간 업체 없이 처리합니다.</span></div>
-<div class="tvhc-crow"><strong>영업과 고객 관리에 집중</strong><span style="color:#595959">대행사는 고객 발굴과 관계에 집중하시면 됩니다. 해외 실행 리스크를 안고 가실 필요가 없습니다.</span></div>
+<div class="tvhc-crow"><strong>현지 실행 전담</strong><span style="color:#595959">섭외부터 가이드라인, 촬영, 검수까지 트래비티가 직접 진행합니다.<br>서울·대련·호치민·대구 4개 거점의 현지 마케터 대응이 가능합니다.</span></div>
+<div class="tvhc-crow"><strong>영업과 고객 관리에 집중</strong><span style="color:#595959">대행사는 고객 발굴과 관계에 집중하시면 됩니다.<br>해외 실행 리스크를 안고 가실 필요가 없습니다.</span></div>
 </div></div></section>
 <section class="tvhc-sec" id="process" style="scroll-margin-top:76px"><div class="tvhc-w">
 <span class="tvhc-label">PROCESS</span>
 <h2 class="tvhc-h2">문의부터 판매까지</h2>
 <div class="tvhc-steps">
-<div class="tvhc-step"><em>STEP 1</em><strong>제휴 문의</strong><span>회사 정보와 주력 고객사 업종을 남겨주세요.</span></div>
-<div class="tvhc-step"><em>STEP 2</em><strong>상담</strong><span>담당자가 연락드려 어떤 상품이 고객사에 맞는지 함께 확인합니다.</span></div>
+<div class="tvhc-step"><em>STEP 1</em><strong>제휴 문의</strong><span>회사 정보와<br>연락처를 남겨주세요.</span></div>
+<div class="tvhc-step"><em>STEP 2</em><strong>미팅</strong><span>미팅을 통해<br>협업 내용을 협의합니다.</span></div>
 <div class="tvhc-step"><em>STEP 3</em><strong>상품 교육</strong><span>제휴 확정 후 상품 구성과 단가, 진행 절차를 전달드립니다.</span></div>
-<div class="tvhc-step"><em>STEP 4</em><strong>판매 시작</strong><span>고객사 제안부터 실행까지 트래비티가 함께 붙습니다.</span></div>
+<div class="tvhc-step"><em>STEP 4</em><strong>판매 시작</strong><span>고객사 제안부터 실행까지 트래비티가 함께 합니다.</span></div>
 </div></div></section>
-<section class="tvhc-sec"><div class="tvhc-w">
-<span class="tvhc-label">TERMS</span>
-<h2 class="tvhc-h2">상담에서 확정하는 항목</h2>
-<p class="tvhc-sub">아래 조건은 회사 규모와 주력 업종에 따라 달라집니다. 일괄로 안내드리기보다 제휴 상담에서 정확한 기준을 드립니다.</p>
-<div class="tvhc-consult">
-<div class="tvhc-crow"><strong>정산 조건</strong><span>수수료 구조와 정산 주기</span></div>
-<div class="tvhc-crow"><strong>계약 기간</strong><span>제휴 계약의 기간과 갱신 방식</span></div>
-<div class="tvhc-crow"><strong>지역 · 업종 배분</strong><span>지역이나 업종에 대한 우선권 여부</span></div>
-<div class="tvhc-crow"><strong>최소 진행 조건</strong><span>제휴 유지에 필요한 최소 조건이 있는지</span></div>
-</div></div></section>
-<section class="tvhc-sec" id="faq" style="scroll-margin-top:76px"><div class="tvhc-w">
+
+<section class="tvhc-sec" id="faq" style="scroll-margin-top:76px;background:#fff5f7"><div class="tvhc-w">
 <span class="tvhc-label">FAQ</span>
 <h2 class="tvhc-h2">자주 묻는 질문</h2>
 <div class="tvhc-acc">
