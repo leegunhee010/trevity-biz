@@ -306,6 +306,14 @@
     const el = ed.el;
     el.removeAttribute('contenteditable');
     el.classList.remove('tvedit-live');
+    // contenteditable이 엔터에서 만드는 <div>/<p> 블록을 <br>로 정규화
+    // (그대로 저장되면 그 줄만 글자 크기·간격이 달라지는 실제 사고 있었음)
+    if(/<(div|p)[\s>]/i.test(el.innerHTML)){
+      el.innerHTML = el.innerHTML
+        .replace(/<(?:div|p)[^>]*>/gi, '<br>')
+        .replace(/<\/(?:div|p)>/gi, '')
+        .replace(/^<br>/, '');
+    }
     const newNorm = tvText(el);
     if(!save || newNorm === ed.origNorm || newNorm === null){
       // 원복
