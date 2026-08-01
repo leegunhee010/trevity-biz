@@ -512,36 +512,8 @@ function savePackage(slug){
 /* ============================================================
    설정
    ============================================================ */
-function saveGhToken(){
-  const v = av('set-gh');
-  if(!v){ toastA('토큰을 입력하세요'); return; }
-  localStorage.setItem('tv_gh_token', v);
-  toastA('✅ 저장됨 — 이제 화면 편집 저장이 HTML에 바로 커밋됩니다');
-  renderSettings2();
-}
-function clearGhToken(){
-  localStorage.removeItem('tv_gh_token');
-  toastA('토큰 삭제됨');
-  renderSettings2();
-}
-function renderSettings2(){
-  document.getElementById('tab-settings').dataset.loaded = '';
-  renderSettings();
-}
 function renderSettings(){
-  const ghSet = !!localStorage.getItem('tv_gh_token');
   document.getElementById('tab-settings').innerHTML = `
-    <div class="card"><h3>화면 편집 → HTML 바로 커밋 (GitHub 연결)</h3>
-      <p class="note">토큰을 넣어두면 화면 편집에서 저장할 때 <b>깃허브 HTML 파일에 즉시 커밋</b>됩니다
-      (깜빡임 없음 · AI가 새 카피를 읽음 · 1~2분 뒤 라이브 반영). 현재: <b>${ghSet ? '✅ 연결됨' : '❌ 미설정 — 저장이 임시(JS) 반영으로 동작'}</b></p>
-      <div class="fgrid two"><div class="fld"><label>GitHub 토큰</label>
-        <input id="set-gh" type="password" placeholder="${ghSet ? '저장돼 있음 — 바꾸려면 새 토큰 입력' : 'github_pat_... 또는 ghp_...'}"></div>
-        <div class="fld" style="display:flex;align-items:flex-end;gap:8px">
-          <button class="btn btn-primary btn-sm" onclick="saveGhToken()">저장</button>
-          ${ghSet ? '<button class="btn btn-ghost btn-sm" onclick="clearGhToken()">삭제</button>' : ''}</div></div>
-      <p class="note" style="margin:0">발급: github.com → Settings → Developer settings → <b>Personal access tokens → Fine-grained</b>
-      → Repository: <code>trevity-biz</code> 만 선택 → Permissions: <b>Contents = Read and write</b> → Generate.
-      토큰은 이 브라우저에만 저장됩니다.</p></div>
     <div class="card"><h3>연결 상태</h3>
       <p class="note">백엔드: <b>${isSB() ? 'Supabase (실서비스)' : '브라우저 저장 (로컬 테스트)'}</b>
       ${isSB() ? '' : '<br>supabase/README.md를 따라 프로젝트를 만들고 assets/js/config.js에 키를 넣으면 실서비스 모드로 전환됩니다.'}</p></div>

@@ -19,72 +19,6 @@
                    && typeof TvData !== 'undefined';
   const sbAdmin = () => SB_OK() && TvData.admin;
 
-  /* ---------- GitHub 직접 굽기 (라이브에서 저장 = HTML 커밋) ----------
-     관리자 설정에서 토큰을 넣어두면 site_copy(JS 오버라이드) 대신
-     GitHub API로 HTML 파일에 바로 커밋한다 → 깜빡임 없음, AI가 새 카피를 읽음. */
-  const GH = { owner: 'leegunhee010', repo: 'trevity-biz', branch: 'main' };
-  const GH_PAGES = ['index','vietnam-tiktok','tourist-vn','tourist-cn','local-vn','stay',
-    'blog','help','agency','inquiry',
-    'blog-post','blog-market','blog-midtier','blog-diy','blog-hantown'];
-  const ghToken = () => localStorage.getItem('tv_gh_token') || '';
-  function b64decodeUtf8(b64){
-    const bin = atob(b64.replace(/\n/g, ''));
-    const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
-    return new TextDecoder().decode(bytes);
-  }
-  function b64encodeUtf8(text){
-    const bytes = new TextEncoder().encode(text);
-    let bin = '';
-    for(let i = 0; i < bytes.length; i += 0x8000)
-      bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
-    return btoa(bin);
-  }
-  async function ghGet(path){
-    const r = await fetch(`https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${path}?ref=${GH.branch}`,
-      { headers: { Authorization: 'Bearer ' + ghToken(), Accept: 'application/vnd.github+json' } });
-    if(r.status === 404) return null;
-    if(!r.ok) throw new Error('GitHub 읽기 실패 ' + r.status + (r.status===401?' — 토큰을 확인하세요':''));
-    const j = await r.json();
-    return { text: b64decodeUtf8(j.content), sha: j.sha };
-  }
-  async function ghPut(path, content, sha, msg, isBase64){
-    const body = { message: msg, branch: GH.branch, content: isBase64 ? content : b64encodeUtf8(content) };
-    if(sha) body.sha = sha;
-    const r = await fetch(`https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${path}`,
-      { method: 'PUT', headers: { Authorization: 'Bearer ' + ghToken(), Accept: 'application/vnd.github+json',
-        'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-    if(!r.ok) throw new Error('GitHub 저장 실패 ' + r.status + (r.status===401?' — 토큰을 확인하세요':''));
-  }
-  /* reps [{old,new}] 를 전 페이지에 적용 (공유 문구 대응).
-     전 페이지를 병렬로 한 번에 읽고, 실제로 바뀌는 파일만 커밋 — 보통 1~2초. */
-  async function ghBake(reps, progress){
-    const cur = (location.pathname.split('/').pop() || 'index.html').replace('.html','') || 'index';
-    const order = [cur, ...GH_PAGES.filter(p => p !== cur)];
-    if(progress) progress('확인 중…');
-    const files = await Promise.all(order.map(async (p, i) => {
-      const path = p + '.html';
-      try{ const f = await ghGet(path); return f ? { path, ...f } : null; }
-      catch(e){ if(i === 0) throw e; return null; }
-    }));
-    const changed = [];
-    for(const f of files){
-      if(!f) continue;
-      let t = f.text, hits = 0;
-      for(const rep of reps){
-        for(const o of [rep.old, rep.old.replace(/<br>/g,'<br/>')]){
-          const c = t.split(o).length - 1;
-          if(c){ t = t.split(o).join(rep.new); hits += c; break; }
-        }
-      }
-      if(hits){
-        if(progress) progress('커밋 중… ' + f.path);
-        await ghPut(f.path, t, f.sha, `copy: 화면편집 — ${f.path} (${hits}곳)`);
-        changed.push(f.path + ':' + hits);
-      }
-    }
-    return changed;
-  }
-
   const TAGS = 'h1,h2,h3,h4,h5,h6,p,span,a,b,strong,em,small,li,td,th,button,div,label,summary,figcaption,blockquote,i,u';
   let on = false;
   let editing = null;   // { el, origNorm, group: [{el, origOuter}] }
@@ -252,27 +186,6 @@
     /* 라이브 모드 이미지: GitHub 토큰 있으면 저장소에 업로드+src 커밋, 없으면 Storage+오버라이드 */
     if(!BAKE_MODE){
       if(t.kind !== 'img'){ say('영상·배경 교체는 로컬 화면 편집(편집서버-시작.bat)에서 지원됩니다.', 5000); return; }
-      if(ghToken()){
-        pickFile('image/*', f => {
-          const fr = new FileReader();
-          fr.onload = async () => {
-            try{
-              say('이미지 커밋 중…', 20000);
-              const ext = (f.name.match(/\.\w+$/) || ['.jpg'])[0].toLowerCase();
-              const name = 'rp_' + Date.now().toString(36) + ext;
-              await ghPut('images/uploads/' + name, fr.result.split(',')[1], null, 'img: 화면편집 업로드 ' + name, true);
-              const oldSrc = t.el.getAttribute('src');
-              const orig = t.el.outerHTML;
-              t.el.src = './images/uploads/' + name;
-              const changed = await ghBake([{ old: orig, new: t.el.outerHTML }], m => say(m, 20000));
-              say(changed.length ? `✅ 이미지 HTML에 커밋됨 — ${changed.join(', ')}` :
-                  '⚠️ 파일에서 원본 이미지를 찾지 못했습니다', 7000);
-            }catch(err){ say('⚠️ ' + (err.message||err), 7000); }
-          };
-          fr.readAsDataURL(f);
-        });
-        return;
-      }
       if(!sbAdmin()){ say('⚠️ 이미지 교체는 관리자 로그인이 필요합니다 — /admin/ 에서 로그인하세요.', 6000); return; }
       pickFile('image/*', f => {
         say('업로드 중…', 12000);
@@ -368,7 +281,7 @@
   }
   function start(el){
     clearHl();
-    if(!BAKE_MODE && !sbAdmin() && !ghToken()){
+    if(!BAKE_MODE && !sbAdmin()){
       say('⚠️ 저장하려면 관리자 로그인이 필요합니다 — /admin/ 에서 로그인 후 다시 열어주세요.', 6000);
       return;
     }
@@ -409,29 +322,16 @@
     });
     say('저장 중…', 8000);
 
-    /* 라이브 모드: GitHub 토큰이 있으면 HTML에 바로 커밋(깜빡임 없음),
-       없으면 site_copy 오버라이드(즉시 반영되지만 JS 스왑) */
+    /* 라이브 모드: site_copy 오버라이드 저장 → 즉시 전 페이지 적용.
+       정적 HTML 반영은 클로드에게 "박아넣어" 요청. */
     if(!BAKE_MODE){
-      if(ghToken()){
-        try{
-          const changed = await ghBake(reps, m => say(m, 20000));
-          if(changed.length){
-            say(`✅ HTML에 커밋됨 — ${changed.join(', ')} (라이브 반영 1~2분)`);
-          } else {
-            say('⚠️ 파일에서 원문을 찾지 못했습니다 — 새로고침(Ctrl+F5) 후 다시 수정해 보세요.', 7000);
-          }
-        }catch(err){
-          say('⚠️ ' + (err.message||err), 7000);
-        }
-        return;
-      }
       try{
         const tmp = document.createElement('div'); tmp.innerHTML = newHTML;
         // 편집기 잔여 속성 정리 후 HTML 그대로 저장 (강조 스팬 유지)
         tmp.querySelectorAll('[contenteditable]').forEach(x=>x.removeAttribute('contenteditable'));
         await Admin.setCopy(ed.copyKey, 'HTML::' + tmp.innerHTML);
         ed.group.forEach(g => { g.el.dataset.tvck = ed.copyKey; });
-        say('✅ 저장됨(임시 반영) — 관리자 설정에 GitHub 토큰을 넣으면 HTML에 바로 박힙니다.');
+        say('✅ 저장됨 — 즉시 적용 (끝나면 클로드에게 "박아넣어")');
       }catch(err){
         say('⚠️ 저장 실패: ' + (err.message||err) + ' — 관리자 로그인 상태를 확인하세요.', 6000);
       }
