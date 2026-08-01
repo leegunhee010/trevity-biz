@@ -76,7 +76,7 @@ def evaluate(f):
     ]
     aeo = [
         ('FAQ 구조화데이터', 20 if 'FAQPage' in types else 0, ''),
-        ('브레드크럼', 20 if 'BreadcrumbList' in types else 0, ''),
+        ('브레드크럼', 20 if ('BreadcrumbList' in types or f.name == 'index.html') else 0, '홈은 면제' if f.name == 'index.html' else ''),
         ('질문·답변 블록', 20 if faq >= 4 else (10 if faq else 0), f'{faq}개'),
         ('소제목 위계(H2·H3)', 20 if h2 >= 2 and h3 >= 2 else (10 if h2 or h3 else 0), f'H2 {h2} · H3 {h3}'),
         ('콘텐츠 유형 명시(Article 등)', 20 if 'Article' in types or ('FAQPage' in types and faq)
