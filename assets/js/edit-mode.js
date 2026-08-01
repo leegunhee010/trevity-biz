@@ -55,16 +55,19 @@
         'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     if(!r.ok) throw new Error('GitHub 저장 실패 ' + r.status + (r.status===401?' — 토큰을 확인하세요':''));
   }
-  /* reps [{old,new}] 를 현재 페이지 우선 → 전 페이지에 적용. 바뀐 파일명 목록 반환 */
+  /* reps [{old,new}] 를 전 페이지에 적용 (공유 문구 대응).
+     전 페이지를 병렬로 한 번에 읽고, 실제로 바뀌는 파일만 커밋 — 보통 1~2초. */
   async function ghBake(reps, progress){
     const cur = (location.pathname.split('/').pop() || 'index.html').replace('.html','') || 'index';
     const order = [cur, ...GH_PAGES.filter(p => p !== cur)];
+    if(progress) progress('확인 중…');
+    const files = await Promise.all(order.map(async (p, i) => {
+      const path = p + '.html';
+      try{ const f = await ghGet(path); return f ? { path, ...f } : null; }
+      catch(e){ if(i === 0) throw e; return null; }
+    }));
     const changed = [];
-    for(let i = 0; i < order.length; i++){
-      const path = order[i] + '.html';
-      if(progress) progress(`저장 중… (${i+1}/${order.length}) ${path}`);
-      let f;
-      try{ f = await ghGet(path); }catch(e){ if(i===0) throw e; continue; }
+    for(const f of files){
       if(!f) continue;
       let t = f.text, hits = 0;
       for(const rep of reps){
@@ -74,10 +77,10 @@
         }
       }
       if(hits){
-        await ghPut(path, t, f.sha, `copy: 화면편집 — ${path} (${hits}곳)`);
-        changed.push(path + ':' + hits);
+        if(progress) progress('커밋 중… ' + f.path);
+        await ghPut(f.path, t, f.sha, `copy: 화면편집 — ${f.path} (${hits}곳)`);
+        changed.push(f.path + ':' + hits);
       }
-      // 첫(현재) 페이지에서 전부 반영됐고 공유 문구가 아니면 조기 종료 판단이 어려우니 전체 스캔 유지
     }
     return changed;
   }
