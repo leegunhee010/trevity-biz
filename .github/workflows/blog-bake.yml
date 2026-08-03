@@ -1,0 +1,41 @@
+name: blog-bake
+# 수파베이스에 저장된 블로그 글을 정적 페이지로 자동 굽기
+# - 10분마다 변경 감지 (변경 없으면 커밋 없음)
+# - Actions 탭에서 수동 실행도 가능 (workflow_dispatch)
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+  repository_dispatch:
+    types: [bake]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: blog-bake
+  cancel-in-progress: false
+
+jobs:
+  bake:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 동기화 + 굽기
+        run: python _sync_blog.py
+      - name: 커밋 + 푸시 (변경 있을 때만)
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "trevity-bot"
+            git config user.email "actions@github.com"
+            git add -A
+            git commit -m "블로그 자동 굽기 (수파베이스 동기화)"
+            git pull --rebase origin main
+            git push
+          else
+            echo "변경 없음"
+          fi
