@@ -498,7 +498,20 @@ def bake_post(post):
     <h1 style="font-size:28px;font-weight:800;margin-bottom:10px;line-height:1.4">{title}</h1>
     <p style="color:#8B95A1;font-size:13px;margin-bottom:28px">{date} · {post.get("read_minutes", 4)}분 분량</p>
     {f'<img src="{thumb}" alt="{title}" style="width:100%;border-radius:12px;margin-bottom:28px">' if thumb else ''}
-    <div style="line-height:1.85;font-size:16px">{post.get("body_html", "")}</div>
+    <style>
+      .tv-postbody{{line-height:1.85;font-size:16px;color:#333}}
+      .tv-postbody h2{{font-size:22px;font-weight:800;margin:34px 0 12px;color:#1f1f1f;line-height:1.4}}
+      .tv-postbody h3{{font-size:18px;font-weight:700;margin:26px 0 10px;color:#1f1f1f}}
+      .tv-postbody p{{margin:0 0 14px}}
+      .tv-postbody ul,.tv-postbody ol{{margin:0 0 16px;padding-left:22px}}
+      .tv-postbody ul{{list-style:disc}}.tv-postbody ol{{list-style:decimal}}
+      .tv-postbody li{{margin-bottom:6px}}
+      .tv-postbody blockquote{{border-left:3px solid #fa6781;background:#fff5f7;padding:14px 18px;margin:20px 0;border-radius:0 10px 10px 0;color:#4e5968}}
+      .tv-postbody img{{max-width:100%;border-radius:10px}}
+      .tv-postbody a{{color:#fa6781}}
+      .tv-postbody strong{{font-weight:700;color:#1f1f1f}}
+    </style>
+    <div class="tv-postbody">{post.get("body_html", "")}</div>
     <p style="margin-top:40px"><a href="./blog.html" style="color:#fa6781;font-weight:700;text-decoration:none">← 블로그 목록으로</a></p>
   </article>
 </div>
