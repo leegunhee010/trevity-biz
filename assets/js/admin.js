@@ -334,7 +334,7 @@ function renderBlog(){
     return;
   }
   el.innerHTML = `
-    <div class="card"><p class="note">blog.html 목록과 blog-post.html?slug=... 상세에 노출됩니다.</p>
+    <div class="card"><p class="note">저장하면 목록에는 즉시, 글 페이지(HTML)는 10분 안에 자동 반영됩니다. 따로 요청할 것 없어요.</p>
     <div class="bar"><span class="grow"></span><button class="btn btn-primary btn-sm" onclick="bEditing='';renderBlog()">+ 새 글 작성</button></div>
     <div class="tbl-wrap"><table><thead><tr><th style="width:76px">썸네일</th><th>제목</th><th>분류</th><th>발행</th><th style="width:120px"></th></tr></thead><tbody>${
       TV_BLOG_POSTS.length ? TV_BLOG_POSTS.map(p=>`
