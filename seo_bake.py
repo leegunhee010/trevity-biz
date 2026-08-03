@@ -458,6 +458,15 @@ def bake_post(post):
         {"@type": "ListItem", "position": 2, "name": "블로그", "item": domain + "/blog.html"},
         {"@type": "ListItem", "position": 3, "name": title, "item": url},
     ]}
+    # 본문 FAQ(details 아코디언) → FAQPage 구조화데이터
+    faqs = extract_faq(post.get("body_html", ""))
+    faq_ld = ""
+    if faqs:
+        faq_ld = '<script type="application/ld+json">' + json.dumps({
+            "@context": "https://schema.org", "@type": "FAQPage",
+            "mainEntity": [{"@type": "Question", "name": q,
+                            "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faqs],
+        }, ensure_ascii=False) + "</script>"
     kw = post.get("category", "") + ", 트래비티, 인플루언서 마케팅"
     og_img = (domain + "/" + thumb.lstrip("./")) if thumb else ""
     html = f'''<!DOCTYPE html>
@@ -475,6 +484,7 @@ def bake_post(post):
 <link rel="canonical" href="{url}">
 <script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>
 <script type="application/ld+json">{json.dumps(crumb, ensure_ascii=False)}</script>
+{faq_ld}
 <script type="application/ld+json">{json.dumps(organization_ld(domain), ensure_ascii=False)}</script>
 <script type="application/ld+json">{json.dumps(localbusiness_ld(domain), ensure_ascii=False)}</script>
 {links}

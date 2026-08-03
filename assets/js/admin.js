@@ -411,8 +411,53 @@ function toggleBlogHtml(){
   }
 }
 
+/* FAQ 블록 — body_html 끝의 <!--tv-faq--> 섹션을 폼 행으로 분리/재조립 */
+function splitFaq(html){
+  const m = String(html||'').match(/<!--tv-faq-->[\s\S]*?<!--\/tv-faq-->/);
+  const faqs = [];
+  if(m){
+    for(const d of m[0].matchAll(/<details[^>]*>\s*<summary[^>]*>([\s\S]*?)<\/summary>([\s\S]*?)<\/details>/g)){
+      const strip = s => s.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+      faqs.push({ q: strip(d[1]).replace(/^Q\.\s*/,''), a: strip(d[2]) });
+    }
+    html = html.replace(m[0], '');
+  }
+  return { html, faqs };
+}
+function faqRowHtml(q, a){
+  return `<div class="faq-row" style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;padding:10px 0;border-bottom:1px solid var(--adm-line)">
+    <div>
+      <input class="faq-q" placeholder="질문 (예: 비용은 어떻게 되나요?)" value="${esc(q||'')}" style="width:100%;margin-bottom:6px">
+      <textarea class="faq-a" placeholder="답변" style="width:100%;min-height:52px">${esc(a||'')}</textarea>
+    </div>
+    <button type="button" class="btn btn-ghost btn-sm" onclick="this.closest('.faq-row').remove()">삭제</button>
+  </div>`;
+}
+function addFaqRow(q, a){
+  const box = document.getElementById('b-faq-rows');
+  if(!box) return;
+  box.insertAdjacentHTML('beforeend', faqRowHtml(q, a));
+}
+function collectFaqHtml(){
+  const rows = [...document.querySelectorAll('#b-faq-rows .faq-row')]
+    .map(r => ({ q: r.querySelector('.faq-q').value.trim(), a: r.querySelector('.faq-a').value.trim() }))
+    .filter(x => x.q && x.a);
+  if(!rows.length) return '';
+  return '<!--tv-faq--><section class="tv-postfaq"><style>.tv-postfaq{margin-top:44px}.tv-postfaq h2{font-size:20px;margin-bottom:14px}'
+    + '.tv-postfaq details{border:1px solid #ffd4dc;border-radius:10px;padding:14px 16px;margin-bottom:10px;background:#fff8f9}'
+    + '.tv-postfaq summary{font-weight:700;cursor:pointer;color:#1f1f1f}.tv-postfaq summary::marker{color:#fa6781}'
+    + '.tv-postfaq p{margin:10px 0 0;color:#4e5968;line-height:1.75}</style>'
+    + '<h2>자주 묻는 질문</h2>'
+    + rows.map(x => `<details><summary>Q. ${esc(x.q)}</summary><p>${esc(x.a).replace(/\n/g,'<br>')}</p></details>`).join('')
+    + '</section><!--/tv-faq-->';
+}
+
 function initBlogEditor(html){
   bHtmlMode = false;
+  const parts = splitFaq(html);
+  html = parts.html;
+  const box = document.getElementById('b-faq-rows');
+  if(box){ box.innerHTML = ''; parts.faqs.forEach(f => addFaqRow(f.q, f.a)); }
   if(typeof Quill === 'undefined') return;
   const el = document.getElementById('rte-b-body');
   if(!el) return;
@@ -480,6 +525,9 @@ function blogForm(slug){
       <button class="btn btn-ghost btn-sm" id="b-htmlbtn" onclick="toggleBlogHtml()" style="font-weight:600">&lt;/&gt; HTML 직접입력</button></h4>
       <div class="rte" id="rte-b-body"></div>
       <textarea id="b-html" spellcheck="false" style="display:none;width:100%;min-height:320px;font-family:ui-monospace,Consolas,monospace;font-size:13px;line-height:1.6;padding:12px;border:1px solid var(--adm-line);border-radius:8px" placeholder="<p>HTML을 그대로 붙여넣으세요</p>"></textarea></div>
+    <div class="sect"><h4 style="display:flex;align-items:center;gap:10px">FAQ <span style="font-weight:400;font-size:12px;color:#8B95A1">글 하단에 아코디언으로 붙고, 검색·AI(FAQPage 구조화데이터)에 잡힙니다</span></h4>
+      <div id="b-faq-rows"></div>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="addFaqRow()" style="margin-top:10px">+ 질문 추가</button></div>
     <div class="fld" style="margin-top:16px"><label style="display:flex;align-items:center;gap:8px;font-weight:600">
       <input type="checkbox" id="b-pub" ${!p||p.published?'checked':''} style="width:auto"> 발행 (체크 해제 시 blog.html에서 숨김)</label></div>
     <div class="bar" style="margin-top:22px"><span class="grow"></span>
@@ -492,9 +540,11 @@ function saveBlogPost(oldSlug){
   if(!title){ toastA('제목을 입력하세요'); return; }
   if(!slug || !/^[a-z0-9-]+$/.test(slug)){ toastA('슬러그는 영문 소문자·숫자·하이픈만 가능합니다'); return; }
   toastA('저장하는 중…');
+  // 본문에 이미 FAQ 블록이 있으면 제거 후 폼의 FAQ로 재조립 (중복 방지)
+  const body = blogBodyGet().replace(/<!--tv-faq-->[\s\S]*?<!--\/tv-faq-->/g, '') + collectFaqHtml();
   admDo(Admin.upsertBlogPost({
     slug, title, category: av('b-cat'), thumbnail_url: av('b-thumb'),
-    excerpt: av('b-excerpt'), body_html: blogBodyGet(),
+    excerpt: av('b-excerpt'), body_html: body,
     read_minutes: Number(av('b-min'))||4, published: document.getElementById('b-pub').checked,
   }), 0);
   bEditing = null;
