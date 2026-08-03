@@ -275,8 +275,31 @@ function downloadFile(name, content, mime){
    ============================================================ */
 let bEditing = null;
 let RTE_BLOG = null;
+let bHtmlMode = false;
+
+function toggleBlogHtml(){
+  const ta = document.getElementById('b-html');
+  const rte = document.getElementById('rte-b-body');
+  const tb = rte ? rte.parentElement.querySelector('.ql-toolbar') : null;
+  const btn = document.getElementById('b-htmlbtn');
+  if(!ta || !rte) return;
+  if(!bHtmlMode){
+    ta.value = RTE_BLOG ? RTE_BLOG.root.innerHTML : '';
+    rte.style.display = 'none'; if(tb) tb.style.display = 'none';
+    ta.style.display = 'block';
+    btn.textContent = '✏️ 에디터로 보기';
+    bHtmlMode = true;
+  }else{
+    if(RTE_BLOG){ RTE_BLOG.root.innerHTML = ''; RTE_BLOG.clipboard.dangerouslyPasteHTML(ta.value); }
+    ta.style.display = 'none';
+    rte.style.display = ''; if(tb) tb.style.display = '';
+    btn.textContent = '</> HTML 직접입력';
+    bHtmlMode = false;
+  }
+}
 
 function initBlogEditor(html){
+  bHtmlMode = false;
   if(typeof Quill === 'undefined') return;
   const el = document.getElementById('rte-b-body');
   if(!el) return;
@@ -291,6 +314,10 @@ function initBlogEditor(html){
   if(html) RTE_BLOG.clipboard.dangerouslyPasteHTML(html);
 }
 function blogBodyGet(){
+  if(bHtmlMode){
+    const ta = document.getElementById('b-html');
+    return ta ? ta.value.trim() : '';
+  }
   if(!RTE_BLOG) return '';
   const html = RTE_BLOG.root.innerHTML;
   return html.replace(/<[^>]*>/g,'').trim() ? html : '';
@@ -336,7 +363,10 @@ function blogForm(slug){
     </div>
     <div class="sect"><h4>썸네일</h4>${uploader('b-thumb', p?p.thumbnail_url:'', {hint:'목록 카드와 상세 상단에 쓰입니다. 16:9 권장.'})}</div>
     <div class="fld"><label>요약 (목록 카드에 표시)</label><textarea id="b-excerpt">${esc(p?p.excerpt:'')}</textarea></div>
-    <div class="sect"><h4>본문</h4><div class="rte" id="rte-b-body"></div></div>
+    <div class="sect"><h4 style="display:flex;align-items:center;gap:10px">본문
+      <button class="btn btn-ghost btn-sm" id="b-htmlbtn" onclick="toggleBlogHtml()" style="font-weight:600">&lt;/&gt; HTML 직접입력</button></h4>
+      <div class="rte" id="rte-b-body"></div>
+      <textarea id="b-html" spellcheck="false" style="display:none;width:100%;min-height:320px;font-family:ui-monospace,Consolas,monospace;font-size:13px;line-height:1.6;padding:12px;border:1px solid var(--adm-line);border-radius:8px" placeholder="<p>HTML을 그대로 붙여넣으세요</p>"></textarea></div>
     <div class="fld" style="margin-top:16px"><label style="display:flex;align-items:center;gap:8px;font-weight:600">
       <input type="checkbox" id="b-pub" ${!p||p.published?'checked':''} style="width:auto"> 발행 (체크 해제 시 blog.html에서 숨김)</label></div>
     <div class="bar" style="margin-top:22px"><span class="grow"></span>
