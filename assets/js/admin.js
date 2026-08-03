@@ -164,15 +164,122 @@ function renderSeo(){
   const el = document.getElementById('tab-seo');
   if(el.dataset.loaded) return;
   el.dataset.loaded = '1';
-  if(!IS_LOCAL_TOOLS){
-    el.innerHTML = `<div class="card"><h3>SEO 관리는 로컬 도구입니다</h3>
-      <p class="note">메타·sitemap·구조화데이터는 HTML 파일에 직접 굽는 작업이라 내 컴퓨터에서 실행합니다.<br>
-      사이트 폴더의 <b>편집서버-시작.bat</b> 을 켠 뒤 <b>http://localhost:5723/admin/</b> 의 SEO 탭에서 편집하고,
-      끝나면 push(또는 클로드에게 "올려줘")하면 라이브에 반영됩니다.</p></div>`;
-    return;
-  }
+  if(!IS_LOCAL_TOOLS){ renderSeoLive(el); return; }
   el.innerHTML = `<p class="tool-note">메타·sitemap·robots·rss·구조화데이터·플로팅 버튼·문의 메일 설정 — 저장 즉시 HTML에 구워집니다.</p>
     <iframe class="tool-frame" src="${EDIT_ORIGIN}/seo.html"></iframe>`;
+}
+
+/* 라이브 SEO 편집 — 페이지별 제목·설명·키워드를 수파베이스에 저장하면 자동 굽기(10분 주기)가 HTML에 반영 */
+async function renderSeoLive(el){
+  el.innerHTML = `<div class="card"><p class="note">페이지별 검색 노출 문구(제목·설명·키워드)를 수정합니다.
+    <b>저장하면 10분 안에 사이트 HTML에 자동 반영됩니다.</b><br>
+    sitemap·구조화데이터·robots 등 기술 세팅은 이미 자동으로 관리되고 있어 만질 필요 없습니다.</p></div>
+    <div id="seo-pages"><div class="card"><p class="note">페이지 정보를 불러오는 중…</p></div></div>`;
+  const box = el.querySelector('#seo-pages');
+  const cards = [];
+  for(const pg of Object.keys(COPY_PAGE_LABELS)){
+    let meta = { title:'', description:'', keywords:'' };
+    try{
+      const html = await (await fetch(`../${pg}.html`, { cache:'no-store' })).text();
+      const t = html.match(/<title>([\s\S]*?)<\/title>/);
+      const d = html.match(/<meta name="description" content="([^"]*)"/);
+      const k = html.match(/<meta name="keywords" content="([^"]*)"/);
+      meta = { title:(t?t[1].trim():''), description:(d?d[1]:''), keywords:(k?k[1]:'') };
+    }catch(e){}
+    let pending = false;
+    const raw = TV_COPY_OVR['seo::'+pg];
+    if(raw){
+      try{
+        const o = JSON.parse(raw);
+        if(o.title !== meta.title || o.description !== meta.description || o.keywords !== meta.keywords){
+          meta = o; pending = true;   // 저장했지만 아직 안 구워진 값을 보여준다
+        }
+      }catch(e){}
+    }
+    cards.push(`<div class="card">
+      <div class="bar"><h3 style="margin:0">${COPY_PAGE_LABELS[pg]} <span class="sub" style="font-weight:400;font-size:12px;color:#8B95A1">${pg}.html</span></h3>
+        ${pending?'<span class="cnt" title="곧 자동으로 HTML에 구워집니다">반영 대기</span>':''}
+        <span class="grow"></span>
+        <button class="btn btn-primary btn-sm" onclick="saveSeoMeta('${pg}')">저장</button></div>
+      <div class="fld"><label>검색 제목 (title · 10~70자)</label><input id="seo-t-${pg}" value="${esc(meta.title)}"></div>
+      <div class="fld"><label>검색 설명 (description · 40~170자)</label><textarea id="seo-d-${pg}">${esc(meta.description)}</textarea></div>
+      <div class="fld"><label>키워드 (쉼표로 구분)</label><input id="seo-k-${pg}" value="${esc(meta.keywords)}"></div>
+    </div>`);
+  }
+  box.innerHTML = cards.join('');
+  renderSeoCfg(el);
+}
+/* 사이트 설정 (인천 관리자와 동일 항목) — 파비콘·OG·헤드코드·채널톡·플로팅 버튼·문의 메일 */
+async function renderSeoCfg(el){
+  let st = {};
+  try{ st = await (await fetch('../admin/data/settings.json', { cache:'no-store' })).json(); }catch(e){}
+  let pending = false;
+  const raw = TV_COPY_OVR['seocfg::settings'];
+  if(raw){
+    try{
+      const o = JSON.parse(raw);
+      if(Object.keys(o).some(k => String(st[k]||'') !== String(o[k]||''))){ Object.assign(st, o); pending = true; }
+    }catch(e){}
+  }
+  const g = k => esc(st[k]||'');
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `<div class="card">
+    <div class="bar"><h3 style="margin:0">사이트 설정</h3>
+      ${pending?'<span class="cnt" title="곧 자동으로 HTML에 구워집니다">반영 대기</span>':''}
+      <span class="grow"></span>
+      <button class="btn btn-primary btn-sm" onclick="saveSeoCfg()">저장</button></div>
+    <div class="fgrid two">
+      <div class="fld"><label>파비콘 (브라우저 탭 아이콘)</label>${uploader('cfg-favicon', st.favicon||'', {hint:'32×32 이상 정사각 PNG 권장'})}</div>
+      <div class="fld"><label>OG 대표 이미지 (카톡·SNS 공유 미리보기)</label>${uploader('cfg-ogImage', st.ogImage||'', {hint:'1200×630 권장'})}</div>
+    </div>
+    <div class="fld"><label>Head 코드 (서치콘솔 인증·애널리틱스 등 — 전 페이지 head에 삽입)</label>
+      <textarea id="cfg-headCode" style="font-family:ui-monospace,Consolas,monospace;font-size:12px;min-height:80px">${g('headCode')}</textarea></div>
+    <div class="fld"><label>채널톡 플러그인 키 (넣으면 전 페이지에 채널톡 버튼)</label><input id="cfg-channelTalkKey" value="${g('channelTalkKey')}"></div>
+    <h4 style="margin:22px 0 6px">플로팅 문의 버튼 (채우는 것만 표시)</h4>
+    <div class="fgrid two">
+      <div class="fld"><label>전화번호</label><input id="cfg-snsPhone" value="${g('snsPhone')}" placeholder="070-4212-8266"></div>
+      <div class="fld"><label>카카오톡 채널 URL</label><input id="cfg-snsKakao" value="${g('snsKakao')}" placeholder="https://pf.kakao.com/..."></div>
+    </div>
+    <div class="fgrid two">
+      <div class="fld"><label>네이버 톡톡 URL</label><input id="cfg-snsNaverTalk" value="${g('snsNaverTalk')}"></div>
+      <div class="fld"><label>인스타그램 URL</label><input id="cfg-snsInstagram" value="${g('snsInstagram')}"></div>
+    </div>
+    <div class="fld"><label>블로그 URL</label><input id="cfg-snsBlog" value="${g('snsBlog')}"></div>
+    <h4 style="margin:22px 0 6px">문의 메일 알림</h4>
+    <div class="fgrid two">
+      <div class="fld"><label>Apps Script 엔드포인트 URL</label><input id="cfg-mailEndpoint" value="${g('mailEndpoint')}" placeholder="https://script.google.com/macros/s/.../exec"></div>
+      <div class="fld"><label>받는 메일 주소</label><input id="cfg-mailTo" value="${g('mailTo')}" placeholder="firstmk111@gmail.com"></div>
+    </div>
+    <p class="note" style="margin-top:14px">저장하면 10분 안에 전 페이지 HTML에 자동으로 구워집니다.</p>
+  </div>`;
+  el.appendChild(wrap.firstElementChild);
+}
+async function saveSeoCfg(){
+  const keys = ['favicon','ogImage','headCode','channelTalkKey','snsPhone','snsKakao','snsNaverTalk','snsInstagram','snsBlog','mailEndpoint','mailTo'];
+  const cfg = {};
+  keys.forEach(k => { const e = document.getElementById('cfg-'+k); cfg[k] = e ? e.value.trim() : ''; });
+  toastA('저장하는 중…');
+  try{
+    await Admin.setCopy('seocfg::settings', JSON.stringify(cfg));
+    TV_COPY_OVR['seocfg::settings'] = JSON.stringify(cfg);
+    toastA('저장됨 — 10분 안에 사이트에 자동 반영됩니다');
+    const el = document.getElementById('tab-seo');
+    delete el.dataset.loaded;
+    renderSeo();
+  }catch(e){ toastA('저장 실패: ' + (e.message||e)); }
+}
+async function saveSeoMeta(pg){
+  const meta = { title:av('seo-t-'+pg), description:av('seo-d-'+pg), keywords:av('seo-k-'+pg) };
+  if(!meta.title){ toastA('검색 제목을 입력하세요'); return; }
+  toastA('저장하는 중…');
+  try{
+    await Admin.setCopy('seo::'+pg, JSON.stringify(meta));
+    TV_COPY_OVR['seo::'+pg] = JSON.stringify(meta);
+    toastA('저장됨 — 10분 안에 사이트에 자동 반영됩니다');
+    const el = document.getElementById('tab-seo');
+    delete el.dataset.loaded;
+    renderSeo();
+  }catch(e){ toastA('저장 실패: ' + (e.message||e)); }
 }
 function navBtn(n, counts){
   const c = counts[n.id];

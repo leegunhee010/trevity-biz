@@ -324,18 +324,20 @@ def bake_settings():
         if head:
             s = s.replace("</head>", f"<!--head-code-->{head}<!--/head-code-->\n</head>", 1)
         if favicon:
-            # 상대경로 고정 (하위 경로 배포에서 절대경로는 404)
+            # 상대경로 고정 (하위 경로 배포에서 절대경로는 404) — 스토리지 등 절대 URL은 그대로
+            fav_href = favicon if favicon.startswith("http") else f"./{favicon}"
             if re.search(r'<link[^>]*rel="(?:shortcut )?icon"[^>]*>', s):
                 s = re.sub(r'<link[^>]*rel="(?:shortcut )?icon"[^>]*>',
-                           f'<link rel="icon" href="./{favicon}">', s, count=1)
+                           f'<link rel="icon" href="{fav_href}">', s, count=1)
             else:
-                s = s.replace("</head>", f'<link rel="icon" href="./{favicon}">\n</head>', 1)
+                s = s.replace("</head>", f'<link rel="icon" href="{fav_href}">\n</head>', 1)
         if ogimage:
+            og_url = ogimage if ogimage.startswith("http") else f"{domain}/{ogimage}"
             if re.search(r'<meta property="og:image" content="[^"]*"', s):
                 s = re.sub(r'(<meta property="og:image" content=")[^"]*(")',
-                           lambda m: m.group(1) + f"{domain}/{ogimage}" + m.group(2), s)
+                           lambda m: m.group(1) + og_url + m.group(2), s)
             else:
-                s = s.replace("</head>", f'<meta property="og:image" content="{domain}/{ogimage}"/>\n</head>', 1)
+                s = s.replace("</head>", f'<meta property="og:image" content="{og_url}"/>\n</head>', 1)
         # 채널톡 플러그인 (전 페이지, 마커 재실행 안전)
         s = re.sub(r"<!--chtalk-->.*?<!--/chtalk-->", "", s, flags=re.S)
         key = (st.get("channelTalkKey") or "").strip()
