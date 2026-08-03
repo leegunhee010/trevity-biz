@@ -11,6 +11,6 @@
  "snsNaverTalk": "",
  "snsInquiry": false,
  "channelTalkKey": "",
- "mailEndpoint": "",
- "mailTo": ""
+ "mailEndpoint": "https://script.google.com/macros/s/AKfycbzp3xFa0Wp8WjXQ3Qc2K4XxONPNbiGOLR-1RENrAnJ9H6GxmEOIWrUlztzFe0-VW_7d/exec",
+ "mailTo": "notice@trevity.com"
 }
