@@ -12,11 +12,17 @@ function toastA(msg){
 }
 
 /* ---------- 이미지 업로드 위젯 ---------- */
-function imgSrc(v){ return TvImg.isRef(v) ? (TvImg.resolve(v) || '') : (v || ''); }
+/* 관리자는 /admin/ 아래에 있어서 사이트 루트 기준 상대경로는 ../ 를 붙여야 미리보기가 뜬다 (저장값은 그대로) */
+function admPrevSrc(u){
+  if(!u) return '';
+  if(/^(https?:|data:|\/|\.\.\/)/.test(u)) return u;
+  return '../' + u.replace(/^\.\//, '');
+}
+function imgSrc(v){ return admPrevSrc(TvImg.isRef(v) ? (TvImg.resolve(v) || '') : (v || '')); }
 function uploader(id, value, opts){
   opts = opts || {};
   const v = value || '';
-  const src = TvImg.isRef(v) ? TvImg.resolve(v) : v;
+  const src = imgSrc(v);
   return `
   <div class="upl" id="${id}-box" ondragover="uplDrag(event,1)" ondragleave="uplDrag(event,0)" ondrop="uplDrop(event,'${id}')">
     <input type="hidden" id="${id}" value="${esc(v)}">
@@ -63,7 +69,7 @@ function uplClear(id){
 function uplSetUrl(id, url){
   const u = String(url||'').trim();
   document.getElementById(id).value = u;
-  document.getElementById(id+'-prev').innerHTML = u ? `<img src="${esc(u)}" alt="">` : `<span class="ph">이미지 없음</span>`;
+  document.getElementById(id+'-prev').innerHTML = u ? `<img src="${esc(admPrevSrc(u))}" alt="">` : `<span class="ph">이미지 없음</span>`;
 }
 
 /* ---------- 운영 데이터 캐시 ---------- */
