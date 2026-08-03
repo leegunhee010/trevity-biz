@@ -111,10 +111,16 @@ Object.assign(Admin, {
       ...p, updated_at: new Date().toISOString(),
     }, { onConflict: 'slug' });
     if(error) throw new Error(error.message);
+    // 메모리 목록도 즉시 갱신 — 재편집 시 저장 전 옛 버전이 보이는 버그 방지
+    const i = TV_BLOG_POSTS.findIndex(x => x.slug === p.slug);
+    if(i >= 0) TV_BLOG_POSTS[i] = { ...TV_BLOG_POSTS[i], ...p };
+    else TV_BLOG_POSTS.unshift({ created_at: new Date().toISOString(), ...p });
   },
   async deleteBlogPost(slug){
     const { error } = await SB.from('blog_posts').delete().eq('slug', slug);
     if(error) throw new Error(error.message);
+    const i = TV_BLOG_POSTS.findIndex(x => x.slug === slug);
+    if(i >= 0) TV_BLOG_POSTS.splice(i, 1);
   },
 
   async upsertPortfolioItem(item){
