@@ -7,6 +7,10 @@
  "snsKakao": "",
  "snsInstagram": "",
  "snsBlog": "",
- "snsPhone": "",
- "mailEndpoint": ""
+ "snsPhone": "070-4212-8266",
+ "snsNaverTalk": "",
+ "snsInquiry": false,
+ "channelTalkKey": "",
+ "mailEndpoint": "",
+ "mailTo": ""
 }
